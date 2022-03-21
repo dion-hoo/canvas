@@ -1,0 +1,29 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #222;
+}
+
+.box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #fff;
+}
+
+.text:nth-child(1) {
+    transform: translateX(350px) rotate(90deg);
+}
+.text:nth-child(2) {
+    transform: rotate(90deg) translateX(350px);
+}

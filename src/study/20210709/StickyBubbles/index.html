@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="./index.css" />
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <footer>
+            <span>footer</span>
+        </footer>
+        <svg>
+            <defs>
+                <filter id="goo">
+                    <fegaussianBlur id="SourceGraphic" stdDeviation="2" />
+                    <feColorMatrix
+                        in="blur"
+                        type="matrix"
+                        value="1 0 0 0 0
+                        0 1 0 0 0
+                        0 0 1 0 0 
+                        0 0 0 1 0 
+                        0 0 0 30 -10
+                    "
+                    />
+                    <feBlend id="SourceGraphic" />
+                </filter>
+            </defs>
+        </svg>
+        <script src="index.js"></script>
+    </body>
+</html>

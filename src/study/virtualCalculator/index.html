@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      }
+
+      .calculator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .price {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        top: 37%;
+        left: 50%;
+        font-size: 32px;
+        line-height: 44px;
+        color: #060b11;
+        font-weight: 600;
+        transform: translateX(-50%);
+      }
+
+      .num {
+        margin-right: 2px;
+        font-size: 35px;
+      }
+
+      .select-bar {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 4px;
+        height: 40px;
+        background: #191c20;
+        border-radius: 3px;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+      }
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <p class="price"><span class="num">0</span>원</p>
+      <span class="select-bar"></span>
+      <canvas id="canvas"></canvas>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>

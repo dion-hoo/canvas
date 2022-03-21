@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title> Text Distorion </title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <section class="section_1">
+                <button>PAINT</button>
+            </section>
+            <section class="section_2">
+                <button>PAINT</button>
+                <button>DION</button>
+                <button>Google</button>
+            </section>
+        </div>
+
+        <svg>
+            <filter id="smudged">
+                <feTurbulence numOctaves="4" seed="2" baseFrequency="0.02 0.05" />
+                <feDisplacementMap scale="50" in="SourceGraphic" />
+            </filter>
+        </svg>
+        <script src="script.js"></script>
+    </body>
+</html>

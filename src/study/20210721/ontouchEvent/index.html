@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                background: #000;
+            }
+            .wrap {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 360px;
+                height: 360px;
+                background: #fff;
+                transform: translate(-50%, -50%);
+            }
+            .inner {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 180px;
+                height: 180px;
+                background: green;
+                transform: translate(-50%, -50%);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrap">
+            <div class="inner"></div>
+        </div>
+        <script>
+            const wrap = document.querySelector('.wrap');
+            const inner = document.querySelector('.inner');
+
+            wrap.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                console.log('start');
+            });
+
+            wrap.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                console.log('end');
+            });
+
+            inner.addEventListener('touchstart', (e) => {
+                console.log(e);
+                e.stopPropagation();
+                console.log('inner start');
+            });
+
+            inner.addEventListener('touchend', (e) => {
+                e.stopPropagation();
+                console.log('inner end');
+            });
+        </script>
+    </body>
+</html>

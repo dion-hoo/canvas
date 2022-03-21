@@ -1,0 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #333;
+}
+
+.box {
+    width: 100px;
+    height: 100px;
+    border: 1px solid red;
+}
