@@ -1,0 +1,330 @@
+@charset 'utf-8';
+
+html {
+  font-family: "Noto Sans KR";
+  font-size: 14px;
+}
+
+body {
+  overflow-x: hidden;
+  color: rgb(29, 29, 31);
+  letter-spacing: -0.05em;
+  background: #fff;
+}
+
+p {
+  line-height: 1.6;
+}
+
+a {
+  color: rgba(29, 29, 31, 1);
+  text-decoration: none;
+}
+
+nav {
+  padding: 0 1rem;
+}
+
+.container {
+  overflow-x: hidden;
+}
+
+.before-load {
+  overflow: hidden;
+}
+
+.before-load .container {
+  display: none;
+}
+
+.before-load .loading {
+  opacity: 1;
+}
+
+.loading {
+  position: fixed;
+  display: grid;
+  place-content: center;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: #fff;
+  z-index: 12;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.loading-circle {
+  width: 54px;
+  height: 54px;
+  animation: loading-spin 3s infinite;
+}
+
+.loading-circle circle {
+  stroke: #000;
+  stroke-width: 4;
+  fill: none;
+  stroke-dasharray: 157;
+  animation: move 1s infinite;
+}
+
+@keyframes move {
+  0% {
+    stroke-dashoffset: 157;
+  }
+  75% {
+    stroke-dashoffset: -147;
+  }
+  100% {
+    stroke-dashoffset: -157;
+  }
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.global-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 44px;
+  z-index: 10;
+}
+
+.local-nav {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  border-bottom: 1px solid #ddd;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: saturate(180%) blur(15px);
+  z-index: 11;
+}
+
+.global-nav-links,
+.local-nav-links {
+  display: flex;
+  align-items: center;
+  max-width: 1000px;
+  height: 100%;
+  margin: 0 auto;
+}
+.global-nav-links {
+  justify-content: space-between;
+}
+
+.local-nav-links a {
+  font-size: 0.8rem;
+}
+
+.local-nav-links a.product-name {
+  margin-right: auto;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.local-nav-links a + a {
+  display: inline-block;
+  margin-left: 2rem;
+}
+
+.scroll-section {
+  position: relative;
+  padding-top: 50vh;
+}
+
+#scroll-section-0 h1 {
+  position: relative;
+  top: -10vh;
+  font-size: 4rem;
+  text-align: center;
+  z-index: 10;
+}
+
+.main-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 35vh;
+  height: 3em;
+  font-size: 2.3rem;
+  margin-top: 10px;
+  opacity: 0;
+}
+
+.main-message p {
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.main-message small {
+  display: block;
+  margin-bottom: 0.5em;
+  font-size: 1.2rem;
+}
+
+#scroll-section-1 {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+#scroll-section-2 .main-message {
+  font-size: 3.5rem;
+}
+
+.description {
+  padding: 0 1rem;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.description strong {
+  float: left;
+  margin-right: 0.2em;
+  font-size: 3rem;
+  color: rgb(29, 29, 31);
+}
+
+.desc-message {
+  width: 50%;
+  font-weight: bold;
+  opacity: 0;
+}
+
+.pin {
+  display: block;
+  width: 1px;
+  height: 100px;
+  background: currentColor;
+}
+
+.min-message {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  font-size: 2rem;
+  color: #888;
+}
+
+.min-message strong {
+  color: rgb(29, 29, 31);
+}
+
+.canvas-caption {
+  max-width: 1000px;
+  margin: 0 auto 0;
+  padding: 0 1rem;
+  color: #888;
+  font-size: 1.2rem;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  height: 7rem;
+  margin-top: 10em;
+  justify-content: center;
+  color: rgb(29, 29, 31);
+  background: coral;
+}
+
+.sticky-elem {
+  display: none;
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.sticky-elem-canvas {
+  top: 0;
+  height: 100%;
+}
+
+.sticky-elem-canvas canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+body#show-scene-0 #scroll-section-0 .sticky-elem,
+body#show-scene-1 #scroll-section-1 .sticky-elem,
+body#show-scene-2 #scroll-section-2 .sticky-elem,
+body#show-scene-3 #scroll-section-3 .sticky-elem {
+  display: block;
+  will-change: opacity, transform;
+}
+
+#scroll-section-2 .b {
+  top: 10%;
+  left: 40%;
+}
+
+#scroll-section-2 .c {
+  top: 15%;
+  left: 45%;
+}
+
+#scroll-section-3 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.imgage-blend-canvas.sticky {
+  position: fixed;
+  top: 0;
+}
+
+@media (min-width: 1024px) {
+  #scroll-section-0 h1 {
+    font-size: 9vw;
+  }
+
+  .main-message {
+    font-size: 4vw;
+  }
+  .description {
+    font-size: 2rem;
+  }
+  .description strong {
+    font-size: 6rem;
+  }
+
+  #scroll-section-2 .main-message {
+    font-size: 6vw;
+  }
+
+  #scroll-section-2 .b {
+    top: 20%;
+    left: 53%;
+  }
+
+  #scroll-section-2 .c {
+    left: 55%;
+  }
+
+  .main-message small {
+    font-size: 1.5vw;
+  }
+
+  .desc-message {
+    width: 20%;
+  }
+
+  .min-message {
+    font-size: 4vw;
+  }
+  .canvas-caption {
+    font-size: 2rem;
+  }
+}

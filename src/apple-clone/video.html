@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        height: 500vh;
+      }
+
+      .cotainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .cotainer canvas {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cotainer">
+      <canvas width="1920" height="1080"></canvas>
+    </div>
+
+    <script>
+      const canvas = document.querySelector("canvas");
+      const context = canvas.getContext("2d");
+
+      const videoFrames = [];
+      const total = 960;
+      let imgElem = document.querySelector("img");
+      let progress;
+      let currentFrame;
+
+      for (let i = 0; i < total; i++) {
+        let img = new Image();
+        img.src = `./video/002/IMG_${7027 + i}.JPG`;
+        videoFrames.push(img);
+      }
+
+      function init() {
+        context.drawImage(videoFrames[0], 0, 0);
+
+        window.addEventListener("scroll", function () {
+          progress =
+            pageYOffset / (document.body.offsetHeight - window.innerHeight);
+
+          requestAnimationFrame(function () {
+            currentFrame = Math.round((total - 1) * progress);
+
+            context.drawImage(videoFrames[currentFrame], 0, 0);
+          });
+        });
+      }
+
+      window.addEventListener("load", init);
+    </script>
+  </body>
+</html>
