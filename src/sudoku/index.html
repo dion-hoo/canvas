@@ -5,6 +5,31 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title> SudoKu </title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            .sudoku {
+                list-style: none;
+                display: grid;
+                grid-template-columns: repeat(9, 1fr);
+
+                width: 400px;
+                height: 400px;
+                margin: 100px auto 0;
+            }
+
+            .sudoku li {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid #000;
+            }
+        </style>
     </head>
-    <body> </body>
+    <body>
+        <ul class="sudoku"> </ul>
+        <script src="index.js"></script>
+    </body>
 </html>
