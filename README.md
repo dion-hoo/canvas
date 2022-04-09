@@ -11,8 +11,8 @@ Youtuber : [Chris Courses](https://www.youtube.com/channel/UC9Yp2yz6-pwhQuPlIDV_
 앞으로 하나씩 만들어보기!!
 
 -   [x] Supter Mario - canvas를 이용한 슈퍼마리오 게임(`superMarioServer`)<br />
--   [ ] SudoKu - <span style="color: #dcffe4; font-weight:bold">STUDYING</span>
--   [ ] Game Tutorial
+-   [x ] SudoKu
+-   [ ] Game Tutorial - <span style="color: #dcffe4; font-weight:bold">STUDYING</span>
 -   [ ] Pokémon
 
 <br/>
