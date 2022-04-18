@@ -23,13 +23,13 @@ export const resolveCollision = (particle, otherParticle) => {
     const xVelocityDiff = particle.velocity.x - otherParticle.velocity.x;
     const yVelocityDiff = particle.velocity.y - otherParticle.velocity.y;
 
-    const xDist = otherParticle.x - particle.x;
-    const yDist = otherParticle.y - particle.y;
+    const xDist = otherParticle.location.x - particle.location.x;
+    const yDist = otherParticle.location.y - particle.location.y;
 
     // Prevent accidental overlap of particles
     if (xVelocityDiff * xDist + yVelocityDiff * yDist >= 0) {
         // Grab angle between the two colliding particles
-        const angle = -Math.atan2(otherParticle.y - particle.y, otherParticle.x - particle.x);
+        const angle = -Math.atan2(otherParticle.location.y - particle.location.y, otherParticle.location.x - particle.location.x);
 
         // Store mass in var for better readability in collision equation
         const m1 = particle.mass;

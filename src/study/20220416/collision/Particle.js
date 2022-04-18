@@ -1,10 +1,10 @@
-import { getDistance } from './utils.js';
+import { getDistance, resolveCollision } from './utils.js';
 import { Vector } from './Vector.js';
 
 export class Particle {
     constructor(x, y, radius, image) {
         this.location = new Vector(x, y);
-        this.veclocity = new Vector(0, 0);
+        this.velocity = new Vector(0, 0);
         this.accleration = new Vector(0, 0);
 
         this.radius = radius;
@@ -13,28 +13,35 @@ export class Particle {
     }
 
     applyForce(force) {
-        const f = force.get();
+        const f = force.copy();
 
-        console.log(f);
-
-        // this.accleration.add(force);
+        f.div(this.mass);
+        this.accleration.add(f);
     }
 
     collision(particle) {
         for (let i = 0; i < particle.length; i++) {
             if (this === particle[i]) continue;
 
-            if (getDistance(this.x, this.y, particle[i].x, particle[i].y) - this.radius * 2 < 0) {
-                this.vx *= -0.8;
-                this.vy *= -0.99;
+            if (getDistance(this.location.x, this.location.y, particle[i].location.x, particle[i].location.y) - this.radius * 2 < 0) {
+                resolveCollision(this, particle[i]);
             }
         }
     }
 
     update() {
-        this.veclocity.add(this.accleration);
-        this.location.add(this.veclocity);
+        this.velocity.add(this.accleration);
+        this.location.add(this.velocity);
         this.accleration.mult(0);
+
+        if (this.location.x - this.radius < 0 || this.location.x > innerWidth - this.radius) {
+            this.velocity.x *= -1;
+        }
+
+        if (this.location.y > innerHeight - this.radius) {
+            this.location.y = innerHeight - this.radius;
+            this.velocity.y *= -0.8;
+        }
     }
 
     draw(ctx) {

@@ -1,4 +1,4 @@
-import { randomIntFromRange } from './utils.js';
+import { getDistance, randomIntFromRange } from './utils.js';
 import { Vector } from './Vector.js';
 
 import { Particle } from './Particle.js';
@@ -22,10 +22,10 @@ const resize = () => {
 const init = () => {
     particles = [];
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 4; i++) {
         const radius = 40;
-        const x = randomIntFromRange(radius, innerWidth - radius);
-        const y = randomIntFromRange(radius, 0);
+        let x = randomIntFromRange(radius, innerWidth - radius);
+        let y = randomIntFromRange(-innerHeight * 0.2, 0);
 
         particles.push(new Particle(x, y, radius, image));
     }
@@ -34,7 +34,7 @@ const init = () => {
 const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const gravity = new Vector(0, 0.1);
+    const gravity = new Vector(0.0001, 0.01);
 
     for (let p of particles) {
         p.applyForce(gravity);
