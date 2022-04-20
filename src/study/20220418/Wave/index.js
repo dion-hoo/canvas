@@ -21,10 +21,11 @@ const init = () => {
     wave = new Wave('#923');
 
     for (let i = 0; i < 1; i++) {
-        const radius = Math.random() * 20 + 30;
+        const radius = Math.random() * 10 + 20;
         const x = radius + Math.random() * (innerWidth - radius + 1);
+        const y = radius;
 
-        people.push(new People(x, 100, radius));
+        people.push(new People(x, y, radius));
     }
 };
 const animate = () => {

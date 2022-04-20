@@ -4,7 +4,7 @@ export class Wave {
     constructor(color) {
         this.radius = 30;
         this.points = [];
-        this.numberOfPoints = 3;
+        this.numberOfPoints = 5;
         this.color = color;
 
         this.init();
@@ -19,10 +19,10 @@ export class Wave {
     draw(ctx) {
         ctx.fillStyle = this.color;
 
+        ctx.beginPath();
         let prevX = this.points[0].x;
         let prevY = this.points[0].y;
 
-        ctx.beginPath();
         for (let i = 0; i < this.points.length; i++) {
             const cx = (prevX + this.points[i].x) / 2;
             const cy = (prevY + this.points[i].y) / 2;
