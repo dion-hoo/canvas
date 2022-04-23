@@ -1,11 +1,13 @@
 import { Point } from './Point.js';
 
 export class Wave {
-    constructor(width, height) {
+    constructor(index, totalPoints, color, width, height) {
         this.width = width;
         this.height = height;
-        this.total = 6;
+        this.totalPoints = totalPoints;
         this.points = [];
+        this.index = index;
+        this.color = color;
 
         this.centerY = this.height / 2;
 
@@ -13,25 +15,24 @@ export class Wave {
     }
 
     init() {
-        for (let i = 0; i < this.total; i++) {
-            const x = (this.width / (this.total - 1)) * i;
+        for (let i = 0; i < this.totalPoints; i++) {
+            const x = (this.width / (this.totalPoints - 1)) * i;
             const y = this.centerY;
 
-            this.points.push(new Point(i + 2, x, y));
+            this.points.push(new Point(this.index + i, x, y));
         }
     }
 
     draw(ctx) {
-        ctx.fillStyle = '#babdb5';
-        ctx.beginPath();
+        ctx.fillStyle = this.color;
 
         let prevX = this.points[0].x;
         let prevY = this.points[0].y;
 
         ctx.moveTo(prevX, prevY);
-
-        for (let i = 1; i < this.total; i++) {
-            if (i < this.total - 1) {
+        ctx.beginPath();
+        for (let i = 1; i < this.totalPoints; i++) {
+            if (i < this.totalPoints - 1) {
                 this.points[i].update();
             }
 

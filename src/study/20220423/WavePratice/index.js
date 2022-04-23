@@ -1,9 +1,9 @@
-import { Wave } from './Wave.js';
+import { WaveGroup } from './WaveGroup.js';
 
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 const ratio = devicePixelRatio;
-let wave;
+let waveGroup;
 
 const resize = () => {
     canvas.width = innerWidth * ratio;
@@ -16,12 +16,12 @@ const resize = () => {
 };
 
 const init = () => {
-    wave = new Wave(canvas.width, canvas.height);
+    waveGroup = new WaveGroup(canvas.width, canvas.height);
 };
 const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    wave.draw(ctx);
+    waveGroup.draw(ctx);
 
     requestAnimationFrame(animate);
 };
