@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title> Love </title>
+        <link rel="stylesheet" href="./index.css" />
+    </head>
+    <body>
+        <div class="Love"> </div>
+        <div class="box x-plus-enter-active"></div>
+        <script>
+            const love = document.querySelector('.Love');
+            const len = 30;
+
+            for (let i = 0; i < len; i++) {
+                const span = document.createElement('span');
+
+                span.setAttribute('class', 'circle');
+                span.style.animationDelay = `${i * 0.1}s`;
+                love.append(span);
+            }
+        </script>
+    </body>
+</html>

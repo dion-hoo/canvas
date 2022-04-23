@@ -1,0 +1,59 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #000;
+}
+
+:root {
+    --delay: 0ms;
+    --path: path(
+        'M.4 76.8C102-24.9 266.9-24.9 368.5 76.8c81.3 81.3 81.3 213.2 0 294.5-65.1 65.1-170.6 65.1-235.6 0-52.1-52.1-52.1-136.5 0-188.5 41.6-41.6 109.2-41.6 150.8 0 33.3 33.3 33.3 87.3 0 120.6-26.7 26.7-69.9 26.7-96.5 0-21.3-21.3-21.3-55.9 0-77.2 17.1-17.1 44.7-17.1 61.8 0 13.6 13.6 13.6 35.8 0 49.4-10.9 10.9-28.6 10.9-39.5 0-8.7-8.7-8.7-22.9 0-31.6 7-7 18.3-7 25.3 0'
+    );
+}
+
+.gyre {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 429px;
+    height: 429px;
+    transform: translate(-50%, -50%);
+}
+
+.box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: hotpink;
+    opacity: 0;
+    motion-path: path('m 66.2,58.979615 c 0,0 -5.195345,18.056477 -20.4,18.056477 -15.204655,0 -20.4,-17.930208 -20.4,-17.930208');
+    animation: move 3000ms infinite ease-in-out;
+}
+
+@keyframes move {
+    0% {
+        motion-offset: 0%;
+        opacity: 1;
+    }
+    70% {
+        transform: scale(0.8);
+    }
+
+    80% {
+        opacity: 1;
+        motion-offset: 100%;
+        transform: scale(0.2);
+    }
+
+    100% {
+        motion-offset: 100%;
+        opacity: 0;
+        transform: scale(0.2);
+    }
+}

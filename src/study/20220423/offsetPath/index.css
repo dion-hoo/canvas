@@ -1,0 +1,79 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --path: path(
+        'm 211.619 15.642 c -137.447 -2.4711 -264.638 212.481 105.926 435.341 c 0.405975 -0.730988 1.96899 -0.730988 2.375 0 c 382.518 -230.049 234.665 -451.64 92.626 -434.391 c -55.373 6.7245 -81.504 37.4565 -93.814 63.888 c -12.309 -26.4315 -38.44 -57.1635 -93.813 -63.888 c -4.438 -0.539301 -8.86601 -0.8702 -13.3 -0.95 l 0 -0.0001 Z'
+    );
+    --lenght: 40;
+}
+
+body {
+    background-color: #000;
+}
+
+.Love {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    height: 500px;
+    transform: translate(-50%, -50%);
+}
+
+.circle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #bf6e6e;
+    offset-distance: 100%;
+    offset-path: var(--path);
+    animation: move 4s infinite ease-in-out;
+}
+
+@keyframes move {
+    to {
+        offset-distance: 0%;
+    }
+}
+
+.x-plus-enter-active {
+    width: 100px;
+    height: 100px;
+    border: 1px solid red;
+    animation: 1s x-plus-enter;
+}
+.x-plus-leave-active {
+    animation: 1s x-plus-leave;
+}
+
+@keyframes x-plus-enter {
+    0% {
+        clip-path: path(
+            'M-400 600L-400 -400L600 -400L600 600L-400 600ZM0.01 -0.02L-200 -0.02L-200 199.98L0.01 199.98L0.01 400L200.01 400L200.01 199.98L400 199.98L400 -0.02L200.01 -0.02L200.01 -200L0.01 -200L0.01 -0.02Z'
+        );
+    }
+    100% {
+        clip-path: path(
+            'M-400 600L-400 -400L600 -400L600 600L-400 600ZM98.33 98.33L95 98.33L95 101.67L98.33 101.67L98.33 105L101.67 105L101.67 101.67L105 101.67L105 98.33L101.67 98.33L101.67 95L98.33 95L98.33 98.33Z'
+        );
+    }
+}
+
+@keyframes x-plus-leave {
+    0% {
+        clip-path: path(
+            'M-400 600L-400 -400L600 -400L600 600L-400 600ZM96.79 95L95 96.79L98.2 100L95 103.2L96.79 105L100 101.79L103.2 105L105 103.2L101.79 100L105 96.79L103.2 95L100 98.2L96.79 95Z'
+        );
+    }
+    100% {
+        clip-path: path(
+            'M-400 600L-400 -400L600 -400L600 600L-400 600ZM-92.31 -200L-200 -92.31L-7.69 100L-200 292.31L-92.31 400L100 207.69L292.31 400L400 292.31L207.69 100L400 -92.31L292.31 -200L100 -7.69L-92.31 -200Z'
+        );
+    }
+}
