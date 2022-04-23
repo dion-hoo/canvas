@@ -30,14 +30,18 @@ export class Hill {
 
         current.x += this.speed;
 
-        if (current.x > -this.gap) {
+        if (-this.gap < current.x) {
             this.points.unshift({
                 x: -(this.gap * 2),
                 y: this.getY(),
             });
-        } else if (current.x > this.width + this.gap) {
+        }
+
+        if (this.points[this.points.length - 1].x > this.width + 2 * this.gap) {
             this.points.splice(-1);
         }
+
+        console.log(this.points);
 
         ctx.moveTo(current.x, current.y);
 
