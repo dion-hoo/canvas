@@ -3,9 +3,9 @@ export class Point {
         this.x = x;
         this.y = y;
         this.fixedY = y;
-        this.speed = 0.03;
+        this.speed = 0.09;
         this.cur = index;
-        this.max = Math.random() * 100 + 100;
+        this.max = Math.random() * 50 + 50;
     }
 
     update() {
