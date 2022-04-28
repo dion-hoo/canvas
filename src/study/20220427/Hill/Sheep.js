@@ -97,9 +97,9 @@ export class Sheep {
     }
 
     getPointOnQuad(x1, y1, x2, y2, x3, y3, t) {
-        const tx = 0;
-        const ty = 0;
-        const rotation = Math.atan(tx, ty);
+        const tx = this.quadTangent(x1, x2, x3, t);
+        const ty = this.quadTangent(y1, y2, y3, t);
+        const rotation = -Math.atan2(tx, ty) + (90 * Math.PI) / 180;
         return {
             x: this.getQuadValue(x1, x2, x3, t),
             y: this.getQuadValue(y1, y2, y3, t),
@@ -107,5 +107,7 @@ export class Sheep {
         };
     }
 
-    quadTangent() {}
+    quadTangent(a, b, c, t) {
+        return 2 * (1 - t) * (b - a) + 2 * (c - b) * t;
+    }
 }
