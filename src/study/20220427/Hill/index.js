@@ -14,8 +14,6 @@ const init = () => {
     hill = [new Hill('#fd6bea', 0.2, 12), new Hill('#ff59c2', 0.5, 8), new Hill('#ff4574', 1, 8)];
     sheepController = new SheepController();
     sun = new Sun();
-
-    console.log(sun);
 };
 const resize = () => {
     canvas.width = innerWidth * ratio;
