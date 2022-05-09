@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>angle</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+                border: 2px dotted deeppink;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas></canvas>
+        <script>
+            const canvas = document.querySelector('canvas');
+            const ctx = canvas.getContext('2d');
+            const ratio = devicePixelRatio;
+
+            const resize = () => {
+                canvas.width = innerWidth * ratio;
+                canvas.height = innerHeight * ratio;
+
+                canvas.style.width = innerWidth + 'px';
+                canvas.style.height = innerHeight + 'px';
+
+                ctx.scale(ratio, ratio);
+            };
+
+            const degreeToRadian = (dgree) => {
+                return (dgree * Math.PI) / 180;
+            };
+
+            const x1 = 100;
+            const y1 = 600;
+
+            const x2 = 400;
+            const y2 = 500;
+
+            const angle = Math.atan2(y1 - y2, x1 - x2);
+            const angle2 = Math.atan2(y2 - y1, x2 - x1);
+
+            console.log(angle * (180 / Math.PI));
+            console.log(angle2 * (180 / Math.PI));
+
+            const animate = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(100, 100, 30, 0, angle);
+                ctx.stroke();
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.arc(400, 400, 30, 0, angle2);
+                ctx.stroke();
+                ctx.closePath();
+            };
+
+            window.addEventListener('resize', resize);
+            window.onload = () => {
+                resize();
+                animate();
+            };
+        </script>
+    </body>
+</html>

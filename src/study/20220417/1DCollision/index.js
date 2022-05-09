@@ -38,7 +38,7 @@ const animate = () => {
         force2 = new Vector(0, 0);
     });
 
-    ball1.applyForce(force1);
+    // ball1.applyForce(force1);
     ball1.update();
     ball1.draw(ctx);
     ball1.collision(ball2);
