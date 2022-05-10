@@ -45,6 +45,7 @@ const animate = () => {
     for (let b of ball) {
         b.update();
         b.bounce();
+        b.collision(ball);
         b.draw(ctx);
     }
 

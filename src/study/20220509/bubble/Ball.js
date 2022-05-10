@@ -24,6 +24,46 @@ export class Bubble {
         };
     }
 
+    collision(ball) {
+        for (let b of ball) {
+            if (b === this) continue;
+
+            const dx = b.x - this.x;
+            const dy = b.y - this.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // https://www.youtube.com/watch?v=Zdicf60eNzA
+
+            if (distance < (this.radius / 2) * 2) {
+                // 벡터를 정규화 한다. 크기를 1로 만든다.
+                const normalize = {
+                    x: dx / distance,
+                    y: dy / distance,
+                };
+                const velocity = {
+                    x: this.vx - b.vx,
+                    y: this.vy - b.vy,
+                };
+
+                // 내적을 계산 한다. 두 벡터의 각도을 알기 위해서
+                const dot = normalize.x * velocity.x + normalize.y * velocity.y;
+
+                if (Math.floor(dot) < 0) return;
+
+                const impluse = (2 * dot) / (this.mass + b.mass);
+
+                this.vx -= impluse * b.mass * normalize.x;
+                this.vy -= impluse * b.mass * normalize.y;
+
+                b.vx += impluse * this.mass * normalize.x;
+                b.vy += impluse * this.mass * normalize.y;
+
+                this.vy *= b.elasticity;
+                b.vy *= this.elasticity;
+            }
+        }
+    }
+
     update() {
         if (this.y + this.gravity < innerHeight) {
             this.vy += this.gravity;
