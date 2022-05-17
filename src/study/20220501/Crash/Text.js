@@ -2,69 +2,31 @@ import { createVector } from './vector.js';
 import { resolveCollision } from './util.js';
 
 export class Text {
-    constructor(ctx) {
-        this.ctx = ctx;
-        this.location = createVector(0, 0);
+    constructor(text, x, y, radius) {
+        this.text = text;
+        this.location = createVector(x, y);
         this.velocity = createVector(0, 0);
         this.acceleration = createVector(0, 0);
         this.fontMass = 10;
         this.border = {
             top: 5,
         };
+        this.radius = radius;
+        this.elasticity = 0.9;
+        this.friction = 0.008;
 
         this.fps = 60;
         this.fpsTime = 1000 / this.fps;
         this.angle = (0 * Math.PI) / 180;
         this.aVeloctiy = 0;
         this.aAcceleration = 0.1;
-        this.direction = Math.random() * 2 - 1;
+        this.direction = Math.random() * 3 - 1.5;
     }
 
-    setText(text) {
-        const fontSize = 60;
-        const fontName = 'Hind';
-
-        this.text = text;
-
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.font = `${fontSize}px ${fontName}`;
-
-        const measureText = this.ctx.measureText(this.text);
-        this.font = {
-            w: measureText.width,
-            h: measureText.actualBoundingBoxDescent + measureText.actualBoundingBoxAscent,
-        };
-    }
-
-    resize(index, width, height, text) {
+    resize(width, height) {
         this.width = width;
         this.height = height;
-
-        const { w, h } = this.font;
-
-        let x = Math.floor(Math.random() * (this.width - w) + w / 2);
-        let y = Math.floor(Math.random() * (this.height * 0.5 - h) + h / 2 + this.border.top);
-
-        if (index !== 0) {
-            for (let i = 0; i < index; i++) {
-                const t = text[i];
-
-                const px = Math.abs(t.location.x - x);
-                const py = Math.abs(t.location.y - y);
-                const pz = Math.floor(Math.sqrt(px * px + py * py));
-                const distance = Math.floor(this.font.w / 2 + t.font.w / 2);
-
-                if (pz - distance <= 0) {
-                    x = Math.floor(Math.random() * (this.width - w) + w / 2);
-                    y = Math.floor(Math.random() * (this.height * 0.5 - h) + h / 2 + this.border.top);
-
-                    i = -1;
-                }
-            }
-        }
-
-        this.location = createVector(x, y);
+        this.location = createVector(this.location.x, this.location.y);
     }
 
     applyForce(force) {
@@ -75,13 +37,37 @@ export class Text {
         for (let t of text) {
             if (t === this) continue;
 
-            const x = Math.abs(this.location.x - t.location.x);
-            const y = Math.abs(this.location.y - t.location.y);
-            const distance = Math.sqrt(x * x + y * y);
+            const dx = this.location.x - t.location.x;
+            const dy = this.location.y - t.location.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // 1차원으로 만들어서 1차원 탄성 충돌
-            if (distance < this.font.w) {
-                resolveCollision(this, t);
+            if (distance < this.radius + t.radius) {
+                const nomalize = {
+                    x: dx / distance,
+                    y: dy / distance,
+                };
+
+                const velocity = {
+                    x: t.velocity.x - this.velocity.x,
+                    y: t.velocity.y - this.velocity.y,
+                };
+
+                const dot = nomalize.x * velocity.x + nomalize.y * velocity.y;
+
+                if (Math.floor(dot) < 0) {
+                    return;
+                }
+
+                const impulse = (2 * dot) / (this.radius + t.radius);
+
+                this.velocity.x += impulse * t.radius * nomalize.x;
+                this.velocity.y += impulse * t.radius * nomalize.y;
+
+                t.velocity.x -= impulse * this.radius * nomalize.x;
+                t.velocity.y -= impulse * this.radius * nomalize.y;
+
+                this.velocity.y *= t.elasticity;
+                t.velocity.y *= this.elasticity;
             }
         }
     }
@@ -90,6 +76,8 @@ export class Text {
         this.velocity.add(this.acceleration);
         this.location.add(this.velocity);
         this.acceleration.mult(0);
+
+        this.velocity.x += -this.velocity.x * this.friction;
     }
 
     grab(mouse) {
@@ -108,47 +96,47 @@ export class Text {
     }
 
     windowBounce() {
-        const { w, h } = this.font;
-        if (this.location.x - w / 2 < 0) {
-            this.location.x = w / 2;
-            this.velocity.x *= -0.8;
+        if (this.location.x - this.radius < 0) {
+            this.location.x = this.radius;
+            this.velocity.x *= -this.elasticity;
         }
 
-        if (this.location.x > this.width - w / 2) {
-            this.location.x = this.width - w / 2;
-            this.velocity.x *= -0.8;
+        if (this.location.x > this.width - this.radius) {
+            this.location.x = this.width - this.radius;
+            this.velocity.x *= -this.elasticity;
         }
+        if (this.location.y - this.radius < 0) {
+            this.velocity.y *= -this.elasticity;
+        }
+        if (this.location.y > this.height - this.radius) {
+            this.location.y = this.height - this.radius;
+            this.velocity.y *= -this.elasticity;
 
-        // h / 2 + this.border.top
-        if (this.location.y > this.height - h / 2 + this.border.top) {
-            this.location.y = this.height - h / 2 + this.border.top;
-            this.velocity.y = 0;
-
-            this.aVeloctiy *= -0.6 * this.direction;
+            this.aVeloctiy *= -this.elasticity;
         }
     }
 
-    draw(t, mouse) {
+    draw(ctx, t, mouse) {
         if (!this.time) {
             this.time = t;
         }
 
         const now = t - this.time;
-
-        if (now > this.fpsTime && mouse.isDown) {
+        if (now > this.fpsTime) {
             this.time = t;
 
-            // this.aVeloctiy += this.aAcceleration * this.direction;
-            // this.angle += this.aVeloctiy;
+            this.aVeloctiy += this.aAcceleration * this.direction;
+            this.angle += this.aVeloctiy;
 
-            // this.aAcceleration *= 0;
+            this.aAcceleration *= 0;
         }
 
-        this.ctx.save();
-        this.ctx.translate(this.location.x, this.location.y);
-        this.ctx.rotate(this.angle);
-        this.ctx.fillText(this.text, 0, 0);
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.translate(this.location.x, this.location.y);
+        ctx.rotate(this.angle);
 
-        this.ctx.restore();
+        ctx.fillText(this.text, 0, 10);
+        ctx.restore();
     }
 }

@@ -21,8 +21,35 @@ const init = () => {
         },
     });
 
-    for (let i = 0; i < 20; i++) {
-        text.push(new Text(ctx));
+    const radius = 30;
+    for (let i = 0; i < 30; i++) {
+        const index = i % letterSize;
+
+        const circle = {
+            radius,
+            x: Math.random() * (innerWidth - radius * 2) + radius,
+            y: Math.random() * (innerHeight * 0.3 - radius * 2) + radius,
+        };
+
+        let isOverlapping = false;
+        for (let j = 0; j < text.length; j++) {
+            const otherCricle = text[j];
+
+            const dx = otherCricle.location.x - circle.x;
+            const dy = otherCricle.location.y - circle.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < otherCricle.radius + circle.radius) {
+                isOverlapping = true;
+                break;
+            }
+        }
+
+        if (!isOverlapping) {
+            const t = letter[index];
+
+            text.push(new Text(t, circle.x, circle.y, circle.radius));
+        }
     }
 };
 
@@ -35,20 +62,15 @@ const resize = () => {
 
     ctx.scale(ratio, ratio);
 
-    ctx.globalCompositeOperation = 'xor';
-    ctx.fillStyle = '#fff';
+    const fontSize = 60;
+    const fontName = 'Hind';
 
-    for (let i = 0; i < text.length; i++) {
-        const t = text[i];
-        const index = i % letterSize;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${fontSize}px ${fontName}`;
 
-        t.setText(letter[index]);
-    }
-
-    for (let i = 0; i < text.length; i++) {
-        const t = text[i];
-
-        t.resize(i, innerWidth, innerHeight, text);
+    for (let t of text) {
+        t.resize(innerWidth, innerHeight);
     }
 };
 
@@ -56,7 +78,7 @@ const animate = (time) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const gravity = createVector(0, 0.4);
-    // const gravity = createVector(0, 0.04);
+    //const gravity = createVector(0, 0.04);
 
     for (let t of text) {
         if (clicked) {
@@ -66,7 +88,7 @@ const animate = (time) => {
             t.windowBounce();
         }
 
-        t.draw(time, mouse);
+        t.draw(ctx, time, clicked);
     }
 
     requestAnimationFrame(animate);

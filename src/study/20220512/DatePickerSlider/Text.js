@@ -6,7 +6,7 @@ export class Text {
     }
 
     draw(ctx) {
-        ctx.fillStyle = `rgba(255, 255, 255, 0.2)`;
+        ctx.fillStyle = `rgba(0, 255, 0, 1)`;
         ctx.fillRect(this.x, this.y, this.size, this.size);
     }
 }

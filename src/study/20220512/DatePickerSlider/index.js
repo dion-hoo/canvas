@@ -9,14 +9,15 @@ let selectBar = null;
 let textGroup = null;
 
 const mouse = {
-    y: 0,
+    moveY: 0,
+    decreaseY: 0,
     offsetY: 0,
     isDown: false,
 };
 
 const init = () => {
-    textGroup = new TextGroup(2, 10);
     selectBar = new SelectBar();
+    textGroup = new TextGroup(10, 4);
 };
 
 const resize = () => {
@@ -28,29 +29,34 @@ const resize = () => {
 
     ctx.scale(ratio, ratio);
 
-    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalCompositeOperation = 'xor';
 
-    textGroup.resize(innerWidth, innerHeight);
     selectBar.resize(innerWidth, innerHeight);
+    textGroup.resize(innerWidth, innerHeight, selectBar);
 };
 
 const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    textGroup.draw(ctx, mouse, selectBar);
     selectBar.draw(ctx);
-    textGroup.draw(ctx, mouse);
 
-    // requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 };
 
 const onDown = (e) => {
     mouse.offsetY = e.clientY;
-    mouse.y = 0;
+
     mouse.isDown = true;
+
+    mouse.decreaseY = 0;
+    mouse.moveY = 0;
 };
 const onMove = (e) => {
     if (mouse.isDown) {
-        mouse.y = e.clientY - mouse.offsetY;
+        mouse.moveY = e.clientY - mouse.offsetY;
+        mouse.decreaseY = e.clientY - mouse.offsetY;
+
         mouse.offsetY = e.clientY;
     }
 };

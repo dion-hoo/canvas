@@ -5,12 +5,12 @@ export class SelectBar {
         this.width = width;
         this.height = height;
 
-        const h = 30;
-        const x = 0;
+        const w = 300;
+        const h = 36;
+        const x = this.width / 2 - w / 2;
         const y = this.height / 2 - h / 2;
-        const w = innerWidth;
-        const padding = 30;
-        const radius = 8;
+        const padding = 0;
+        const radius = 13;
 
         this.roundRect = new RoundRect(x, y, w, h, padding, radius);
     }

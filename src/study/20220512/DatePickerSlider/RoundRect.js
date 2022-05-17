@@ -11,7 +11,7 @@ export class RoundRect {
     draw(ctx) {
         ctx.save();
 
-        ctx.fillStyle = `rgba(255, 255, 255, 0.3)`;
+        ctx.fillStyle = `rgba(255, 255, 255, 1)`;
 
         // top left
         ctx.moveTo(this.x + this.padding, this.y + this.radius);
