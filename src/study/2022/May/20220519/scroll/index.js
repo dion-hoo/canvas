@@ -1,18 +1,14 @@
 class IosSelector {
-    constructor(options) {
-        let defaults = {
-            el: '', // dom
-            type: 'infinite', // infinite 无限滚动，normal 非无限
-            count: 20, // 圆环规格，圆环上选项个数，必须设置 4 的倍数
-            sensitivity: 0.8, // 灵敏度
-            source: [], // 选项 {value: xx, text: xx}
-            value: null,
-            onChange: null,
-        };
+    constructor(el, type = 'infinite', source = 0.8, count = 20, onChange) {
+        this.el = el;
+        this.type = type;
+        this.count = count;
+        this.sensitivity = source;
+        this.source = [];
+        this.value = null;
+        this.onChange = onChange;
 
-        this.options = Object.assign({}, defaults, options);
         this.options.count = this.options.count - (this.options.count % 4);
-        Object.assign(this, this.options);
 
         this.halfCount = this.options.count / 2;
         this.quarterCount = this.options.count / 4;
@@ -40,6 +36,7 @@ class IosSelector {
         };
 
         this.itemHeight = (this.elems.el.offsetHeight * 3) / this.options.count; // 每项高度
+
         this.itemAngle = 360 / this.options.count; // 每项之间旋转度数
         this.radius = this.itemHeight / Math.tan((this.itemAngle * Math.PI) / 180); // 圆环半径
 
@@ -448,12 +445,6 @@ let currentMonth = 1;
 let monthSelector;
 
 monthSource = getMonths();
-monthSelector = new IosSelector({
-    el: '#month1',
-    type: 'infinite',
-    source: monthSource,
-    count: 20,
-    onChange: (selected) => {
-        currentMonth = selected.value;
-    },
+monthSelector = new IosSelector('#month1', 'infinite', monthSource, 20, (selected) => {
+    currentMonth = selected.value;
 });
