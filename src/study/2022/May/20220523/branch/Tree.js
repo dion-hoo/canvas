@@ -4,7 +4,6 @@ import { degreeToRadian, Random } from './util.js';
 export class Tree {
     constructor() {
         this.depth = 10;
-        this.currentDepth = 0;
         this.animation = null;
     }
 

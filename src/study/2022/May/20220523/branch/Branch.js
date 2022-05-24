@@ -6,6 +6,11 @@ export class Branch {
         this.endY = endY;
         this.lineWidth = lineWidth;
 
+        this.angle = -Math.PI / 2;
+        this.aVelocity = 0;
+        this.aAccleration = 0;
+        this.damping = 0.99;
+
         this.currentX = this.startX;
         this.currentY = this.startY;
 
@@ -18,6 +23,8 @@ export class Branch {
     }
 
     draw(ctx) {
+        ctx.save();
+
         if (this.currentFrame !== this.frame) {
             this.currentX += this.offsetX;
             this.currentY += this.offsetY;
@@ -28,8 +35,6 @@ export class Branch {
         } else {
             this.result = true;
         }
-
-        ctx.save();
 
         if (this.lineWidth < 1) {
             ctx.lineWidth = ctx.lineWidth * 0.1;
@@ -45,10 +50,26 @@ export class Branch {
             ctx.lineWidth = this.lineWidth;
         }
 
+        if (this.result) {
+            const G = 0.02;
+
+            this.aAccleration = -(Math.sin(this.angle) * G) / 20;
+            this.aVelocity += this.aAccleration;
+            this.angle += this.aVelocity;
+            this.aVelocity *= this.damping;
+
+            ctx.save();
+            ctx.translate(innerWidth / 2, innerHeight);
+            ctx.rotate(this.angle);
+            ctx.restore();
+        }
+
         ctx.strokeStyle = '#444';
         ctx.beginPath();
+
         ctx.moveTo(this.startX, this.startY);
-        ctx.lineTo(this.currentX, this.currentY);
+        ctx.lineTo(this.endX, this.endY);
+
         ctx.stroke();
         ctx.closePath();
 
