@@ -9,8 +9,58 @@
     </head>
     <body>
         <div class="date-selector">
-            <div class="month" id="month1"></div>
+            <div class="month">
+                <ul class="options">
+                    <li>1월</li>
+                    <li>2월</li>
+                    <li>3월</li>
+                    <li>4월</li>
+                    <li>5월</li>
+                    <li>6월</li>
+                    <li>7월</li>
+                    <li>8월</li>
+                    <li>9월</li>
+                    <li>10월</li>
+                    <li>11월</li>
+                    <li>12월</li>
+                    <li>13월</li>
+                    <li>14월</li>
+                    <li>15월</li>
+                    <li>10월</li>
+                    <li>11월</li>
+                    <li>12월</li>
+                    <li>13월</li>
+                    <li>14월</li>
+                    <li>15월</li>
+                </ul>
+                <div class="highLight"></div>
+            </div>
         </div>
         <script src="./index.js"></script>
+        <script>
+            const wrap = document.querySelector('.month');
+            const items = document.querySelectorAll('.options li');
+            const count = 20;
+            const itemHeight = wrap.offsetHeight;
+            const rotate = 360 / count;
+            const distance = itemHeight / 2;
+            const months = [];
+
+            [...items].forEach((li, index) => {
+                li.style.transform = `rotateX(${rotate * (index + 1)}deg) translate3d(0, 0, ${distance}px)`;
+
+                months.push({
+                    value: index + 1,
+                    text: index + 1 + '월',
+                });
+            });
+
+            monthSelector = new IosSelector({
+                el: '.month',
+                type: 'infinite',
+                source: months,
+                count: 20,
+            });
+        </script>
     </body>
 </html>
