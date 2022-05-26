@@ -26,12 +26,17 @@
                     <li>13월</li>
                     <li>14월</li>
                     <li>15월</li>
-                    <li>10월</li>
-                    <li>11월</li>
-                    <li>12월</li>
-                    <li>13월</li>
-                    <li>14월</li>
-                    <li>15월</li>
+                    <li>16월</li>
+                    <li>17월</li>
+                    <li>18월</li>
+                    <li>19월</li>
+                    <li>20월</li>
+                    <li>21월</li>
+                    <li>22월</li>
+                    <li>23월</li>
+                    <li>24월</li>
+                    <li>25월</li>
+                    <li>26월</li>
                 </ul>
                 <div class="highLight"></div>
             </div>
@@ -41,13 +46,13 @@
             const wrap = document.querySelector('.month');
             const items = document.querySelectorAll('.options li');
             const count = 20;
-            const itemHeight = wrap.offsetHeight;
+            const itemHeight = items[0].clientHeight;
             const rotate = 360 / count;
-            const distance = itemHeight / 2;
+            const distance = itemHeight / Math.tan((rotate * Math.PI) / 180);
             const months = [];
 
             [...items].forEach((li, index) => {
-                li.style.transform = `rotateX(${rotate * (index + 1)}deg) translate3d(0, 0, ${distance}px)`;
+                li.style.transform = `rotateX(-${rotate * index}deg) translate3d(0, 0, ${distance}px)`;
 
                 months.push({
                     value: index + 1,
@@ -56,10 +61,14 @@
             });
 
             monthSelector = new IosSelector({
-                el: '.month',
-                type: 'infinite',
+                el: wrap,
                 source: months,
-                count: 20,
+                count,
+            });
+
+            let now = new Date();
+            setTimeout(function () {
+                monthSelector.select(now.getMonth() + 20);
             });
         </script>
     </body>

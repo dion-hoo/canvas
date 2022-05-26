@@ -17,7 +17,7 @@ export class Branch {
         this.result = false;
 
         this.currentFrame = 0;
-        this.frame = 8;
+        this.frame = 30;
         this.offsetX = (this.endX - this.startX) / this.frame;
         this.offsetY = (this.endY - this.startY) / this.frame;
     }
