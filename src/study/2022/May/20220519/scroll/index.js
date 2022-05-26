@@ -54,26 +54,59 @@ class IosSelector {
 
     touchstart(event) {
         this.mouse.moveY = 0;
-        this.mouse.offsetY = event.clientY;
+        this.mouse.offsetY = event.clientY || event.touches[0].clientY;
         this.mouse.isDown = true;
         this.stop;
     }
 
     touchmove(event) {
         if (this.mouse.isDown) {
-            this.mouse.moveY = (event.clientY - this.mouse.offsetY) / 45;
+            let eventY = event.clientY || event.touches[0].clientY;
+
+            this.mouse.moveY = (this.mouse.offsetY - eventY) / 45;
 
             let moveToScroll = this.mouse.moveY + this.scroll;
 
-            this.moveTo(moveToScroll);
+            if (moveToScroll < 0) {
+                // 처음일때
+                moveToScroll *= 0.3;
+            } else if (moveToScroll > this.source.length - 1) {
+                // 제일 끝일때
+                moveToScroll = this.source.length + (moveToScroll - this.source.length) * 0.3;
+            }
 
-            this.mouse.moveToScroll = moveToScroll;
+            this.mouse.moveToScroll = this.moveTo(moveToScroll);
         }
     }
 
     touchend() {
+        let direction = 0; // 방향
+
+        if (this.mouse.moveToScroll < 0) {
+        } else {
+        }
+
         this.mouse.isDown = false;
         this.scroll = this.mouse.moveToScroll;
+        this.animateToScroll(8, 20, 12);
+    }
+
+    touchToScroll() {
+        const initScroll = this.scroll;
+        let finalScroll;
+        let moveScroll;
+
+        a = initV > 0 ? -this.a : this.a;
+        t = Math.abs(initV / a);
+        moveScroll = initV * t + (a * t * t) / 2;
+
+        finalScroll = Math.round(this.scroll + moveScroll);
+        finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
+
+        moveScroll = finalScroll - initScroll;
+        t = Math.sqrt(Math.abs(moveScroll / a));
+
+        this.animateToScroll(initScroll, finalScroll, t);
     }
 
     moveTo(scroll) {
