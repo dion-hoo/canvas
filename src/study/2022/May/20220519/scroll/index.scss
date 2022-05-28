@@ -5,6 +5,7 @@ $TOTALLENGH: 12;
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html,
@@ -39,6 +40,7 @@ body {
         height: 100%;
         text-align: center;
         overflow: hidden;
+
         ul {
             position: absolute;
             top: 50%;
@@ -69,7 +71,14 @@ body {
     top: 50%;
     left: 0;
     width: 100%;
-    height: 45px;
-    background-color: rgba(92, 102, 92, 0.4);
+    height: 35px;
+    padding: 0 3px;
     transform: translate(0, -50%);
+}
+
+.highLight__inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    background-color: rgba(92, 102, 92, 0.4);
 }

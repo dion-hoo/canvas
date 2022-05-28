@@ -9,6 +9,44 @@
     </head>
     <body>
         <div class="date-selector">
+            <div class="year">
+                <ul class="options">
+                    <li>2002년</li>
+                    <li>2003년</li>
+                    <li>2004년</li>
+                    <li>2005년</li>
+                    <li>2006년</li>
+                    <li>2007년</li>
+                    <li>2008년</li>
+                    <li>2009년</li>
+                    <li>2010년</li>
+                    <li>2011년</li>
+                    <li>2012년</li>
+                    <li>2013년</li>
+                    <li>2014년</li>
+                    <li>2015년</li>
+                    <li>2016년</li>
+                    <li>2017년</li>
+                    <li>2018년</li>
+                    <li>2019년</li>
+                    <li>2010년</li>
+                    <li>2011년</li>
+                    <li>2012년</li>
+                    <li>2013년</li>
+                    <li>2014년</li>
+                    <li>2015년</li>
+                    <li>2016년</li>
+                    <li>2017년</li>
+                    <li>2018년</li>
+                    <li>2019년</li>
+                    <li>2020년</li>
+                    <li>2021년</li>
+                    <li>2022년</li>
+                </ul>
+                <div class="highLight">
+                    <div class="highLight__inner"></div>
+                </div>
+            </div>
             <div class="month">
                 <ul class="options">
                     <li>1월</li>
@@ -23,53 +61,110 @@
                     <li>10월</li>
                     <li>11월</li>
                     <li>12월</li>
-                    <li>13월</li>
-                    <li>14월</li>
-                    <li>15월</li>
-                    <li>16월</li>
-                    <li>17월</li>
-                    <li>18월</li>
-                    <li>19월</li>
-                    <li>20월</li>
-                    <li>21월</li>
-                    <li>22월</li>
-                    <li>23월</li>
-                    <li>24월</li>
-                    <li>25월</li>
-                    <li>26월</li>
                 </ul>
-                <div class="highLight"></div>
+                <div class="highLight">
+                    <div class="highLight__inner"></div>
+                </div>
+            </div>
+            <div class="day">
+                <ul class="options">
+                    <li>1일</li>
+                    <li>2일</li>
+                    <li>3일</li>
+                    <li>4일</li>
+                    <li>5일</li>
+                    <li>6일</li>
+                    <li>7일</li>
+                    <li>8일</li>
+                    <li>9일</li>
+                    <li>10일</li>
+                    <li>11일</li>
+                    <li>12일</li>
+                    <li>13일</li>
+                    <li>14일</li>
+                    <li>15일</li>
+                    <li>16일</li>
+                    <li>17일</li>
+                    <li>18일</li>
+                    <li>19일</li>
+                    <li>20일</li>
+                    <li>21일</li>
+                    <li>22일</li>
+                    <li>23일</li>
+                    <li>24일</li>
+                    <li>25일</li>
+                    <li>26일</li>
+                    <li>27일</li>
+                    <li>28일</li>
+                    <li>29일</li>
+                    <li>30일</li>
+                    <li>31일</li>
+                    <li>32일</li>
+                    <li>33일</li>
+                </ul>
+                <div class="highLight">
+                    <div class="highLight__inner"></div>
+                </div>
             </div>
         </div>
         <script src="./index.js"></script>
         <script>
-            const wrap = document.querySelector('.month');
-            const items = document.querySelectorAll('.options li');
+            const now = new Date();
             const count = 20;
-            const itemHeight = items[0].clientHeight;
-            const rotate = 360 / count;
-            const distance = itemHeight / Math.tan((rotate * Math.PI) / 180);
-            const months = [];
+            let yearSelector, monthSelector, daySelector;
 
-            [...items].forEach((li, index) => {
-                li.style.transform = `rotateX(-${rotate * index}deg) translate3d(0, 0, ${distance}px)`;
+            // year
+            const year = document.querySelector('.year');
+            const yearItems = year.querySelectorAll('.options li');
 
-                months.push({
-                    value: index + 1,
-                    text: index + 1 + '월',
+            // month
+            const month = document.querySelector('.month');
+            const monthItems = month.querySelectorAll('.options li');
+
+            // day
+            const day = document.querySelector('.day');
+            const dayItems = day.querySelectorAll('.options li');
+
+            const createItemStyle = (item) => {
+                const itemHeight = item[0].clientHeight;
+                const rotate = 360 / count;
+                const distance = itemHeight / Math.tan((rotate * Math.PI) / 180);
+
+                [...item].forEach((li, index) => {
+                    const regex = /\D+/gi;
+                    const number = li.innerText.replace(regex, '');
+
+                    li.style.transform = `rotateX(-${rotate * index}deg) translate3d(0, 0, ${distance}px)`;
+                    li.setAttribute('data-value', number);
                 });
-            });
+            };
 
-            monthSelector = new IosSelector({
-                el: wrap,
-                source: months,
+            // year
+            createItemStyle(yearItems);
+            yearSelector = new IosSelector({
+                el: year,
+                source: yearItems,
                 count,
             });
+            yearSelector.select(now.getFullYear());
 
-            let now = new Date();
-            setTimeout(function () {
-                monthSelector.select(now.getMonth() + 2);
+            // month
+            createItemStyle(monthItems);
+            monthSelector = new IosSelector({
+                el: month,
+                source: monthItems,
+                count,
             });
+            monthSelector.select(now.getMonth() + 1);
+
+            // day
+            createItemStyle(dayItems);
+            daySelector = new IosSelector({
+                el: day,
+                source: dayItems,
+                count,
+            });
+            daySelector.select(now.getDate());
         </script>
     </body>
 </html>

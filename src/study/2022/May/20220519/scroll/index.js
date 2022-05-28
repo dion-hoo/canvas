@@ -1,36 +1,45 @@
 const easing = {
-    easeOutCubic: (pos) => {
-        return Math.pow(pos - 1, 3) + 1;
+    easeOutCubic: (x) => {
+        return 1 - Math.pow(1 - x, 3);
     },
-    easeOutExpo: (pos) => {
-        return 1 - Math.pow(2, -10 * pos);
+    easeOutExpo: (x) => {
+        return 1 - Math.pow(2, -10 * x);
     },
-    easeOutBounce: (pos) => {
+    easeOutBounce: (x) => {
         const n1 = 7.5625;
         const d1 = 2.75;
 
-        if (pos < 1 / d1) {
-            return n1 * pos * pos;
-        } else if (pos < 2 / d1) {
-            return n1 * (pos -= 1.5 / d1) * pos + 0.75;
-        } else if (pos < 2.5 / d1) {
-            return n1 * (pos -= 2.25 / d1) * pos + 0.9375;
+        if (x < 1 / d1) {
+            return n1 * x * x;
+        } else if (x < 2 / d1) {
+            return n1 * (x -= 1.5 / d1) * x + 0.75;
+        } else if (x < 2.5 / d1) {
+            return n1 * (x -= 2.25 / d1) * x + 0.9375;
         } else {
-            return n1 * (pos -= 2.625 / d1) * pos + 0.984375;
+            return n1 * (x -= 2.625 / d1) * x + 0.984375;
         }
     },
+    easeInOutElastic: (x) => {
+        const c5 = (2 * Math.PI) / 4.5;
+
+        return x === 0
+            ? 0
+            : x === 1
+            ? 1
+            : x < 0.5
+            ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2
+            : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;
+    },
 };
-const list = document.querySelector('.options');
 
 class IosSelector {
     constructor(options) {
         this.el = options.el;
         this.source = options.source;
         this.count = options.count - (options.count % 4);
-        this.sensitivity = 30;
-        this.cancelAnimation = null;
         this.itemAngle = 360 / this.count;
-        this.half = 10;
+        this.cancelAnimation = null;
+        this.half = 7;
         this.scroll = 0;
         this.mouse = {
             moveY: 0,
@@ -56,7 +65,6 @@ class IosSelector {
         this.mouse.moveY = 0;
         this.mouse.offsetY = event.clientY || event.touches[0].clientY;
         this.mouse.isDown = true;
-        this.stop;
     }
 
     touchmove(event) {
@@ -69,10 +77,10 @@ class IosSelector {
 
             if (moveToScroll < 0) {
                 // 처음일때
-                moveToScroll *= 0.3;
-            } else if (moveToScroll > this.source.length - 1) {
+                moveToScroll *= 0.1;
+            } else if (moveToScroll > this.source.length) {
                 // 제일 끝일때
-                moveToScroll = this.source.length + (moveToScroll - this.source.length) * 0.3;
+                moveToScroll = this.source.length + (moveToScroll - this.source.length) * 0.1;
             }
 
             this.mouse.moveToScroll = this.moveTo(moveToScroll);
@@ -80,36 +88,28 @@ class IosSelector {
     }
 
     touchend() {
-        let direction = 0; // 방향
-
-        if (this.mouse.moveToScroll < 0) {
-        } else {
-        }
-
         this.mouse.isDown = false;
-        this.scroll = this.mouse.moveToScroll;
-        this.animateToScroll(8, 20, 12);
+
+        const finalScroll = this.mouse.moveToScroll;
+
+        this.scroll = finalScroll;
     }
 
-    touchToScroll() {
-        const initScroll = this.scroll;
+    touchToScroll(force) {
+        let initScroll = this.scroll;
         let finalScroll;
         let moveScroll;
 
-        a = initV > 0 ? -this.a : this.a;
-        t = Math.abs(initV / a);
-        moveScroll = initV * t + (a * t * t) / 2;
-
-        finalScroll = Math.round(this.scroll + moveScroll);
+        finalScroll = Math.round(this.scroll + force);
         finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
-
         moveScroll = finalScroll - initScroll;
-        t = Math.sqrt(Math.abs(moveScroll / a));
 
-        this.animateToScroll(initScroll, finalScroll, t);
+        this.animateToScroll(initScroll, finalScroll, moveScroll);
     }
 
     moveTo(scroll) {
+        const list = this.el.querySelector('.options');
+
         list.style.transform = `rotateX(${this.itemAngle * scroll}deg)`;
 
         [...list.children].map((li, index) => {
@@ -121,19 +121,26 @@ class IosSelector {
         return scroll;
     }
 
-    animateToScroll(initScroll, finalScroll, moveScroll, easingName = 'easeOutExpo') {
-        let currnetScroll = 0;
+    animateToScroll(initScroll, finalScroll, velocity, easingName = 'easeOutExpo') {
+        let scrollLength = finalScroll - initScroll;
+        let startTimeStamp = new Date().getTime() / 1000; // second
+        // 타임 스탬프 값을 얻는다. 타임스탬프란 현재 시간을 밀리 세컨드 단위로 변환하여 보여주는 것
+        // 밀리 세컨드를 반환한다.
+        // 1초가 1000ms
+        // 1ms = 1 / 1000초
+        // 밀리 세컨드로 사용하는 이유는 값을 비교할때 정확한 값을 비교하기 위해서다.
+        // 그리고 시, 분,초 로 하게 되면 24시간이 지나면 1로 되고, 60분이 지나면 1로 되어서 계산하기가 힘들다.
 
         const tick = () => {
-            if (initScroll + currnetScroll < finalScroll) {
-                this.scroll = this.moveTo(initScroll + easing[easingName](currnetScroll / moveScroll) * moveScroll);
+            let endTimeStamp = new Date().getTime() / 1000 - startTimeStamp; // 밀리세컨트를 초로 변경해서 1초 2초 3초 이거를 구하기 위해서이다.
+
+            if (endTimeStamp < velocity) {
+                this.scroll = this.moveTo(initScroll + easing[easingName](endTimeStamp / velocity) * scrollLength);
                 this.cancelAnimation = requestAnimationFrame(tick);
             } else {
-                this.scroll = this.moveTo(initScroll + moveScroll);
-                this.stop;
+                this.scroll = this.moveTo(initScroll + scrollLength);
+                this.cancelAnimation = cancelAnimationFrame(tick);
             }
-
-            currnetScroll += 0.1;
         };
         tick();
     }
@@ -144,14 +151,14 @@ class IosSelector {
 
     select(value) {
         for (let i = 0; i < this.source.length; i++) {
-            if (this.source[i].value === value) {
-                window.cancelAnimationFrame(this.cancelAnimation);
-
+            if (+this.source[i].dataset.value === value) {
                 const initScroll = this.scroll;
                 const finalScroll = i;
                 const moveScroll = Math.abs(finalScroll - initScroll);
+                const velocity = moveScroll / 10; // 도달 위치를 10초안에 이동을 해야한다.
+                // 그래서 1초에 이동할 속도를 구한다.
 
-                this.animateToScroll(initScroll, finalScroll, moveScroll);
+                this.animateToScroll(initScroll, finalScroll, velocity);
 
                 return;
             }
