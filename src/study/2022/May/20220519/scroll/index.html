@@ -9,63 +9,6 @@
     </head>
     <body>
         <div class="date-selector">
-            <div class="year">
-                <ul class="options">
-                    <li>2002년</li>
-                    <li>2003년</li>
-                    <li>2004년</li>
-                    <li>2005년</li>
-                    <li>2006년</li>
-                    <li>2007년</li>
-                    <li>2008년</li>
-                    <li>2009년</li>
-                    <li>2010년</li>
-                    <li>2011년</li>
-                    <li>2012년</li>
-                    <li>2013년</li>
-                    <li>2014년</li>
-                    <li>2015년</li>
-                    <li>2016년</li>
-                    <li>2017년</li>
-                    <li>2018년</li>
-                    <li>2019년</li>
-                    <li>2010년</li>
-                    <li>2011년</li>
-                    <li>2012년</li>
-                    <li>2013년</li>
-                    <li>2014년</li>
-                    <li>2015년</li>
-                    <li>2016년</li>
-                    <li>2017년</li>
-                    <li>2018년</li>
-                    <li>2019년</li>
-                    <li>2020년</li>
-                    <li>2021년</li>
-                    <li>2022년</li>
-                </ul>
-                <div class="highLight">
-                    <div class="highLight__inner"></div>
-                </div>
-            </div>
-            <div class="month">
-                <ul class="options">
-                    <li>1월</li>
-                    <li>2월</li>
-                    <li>3월</li>
-                    <li>4월</li>
-                    <li>5월</li>
-                    <li>6월</li>
-                    <li>7월</li>
-                    <li>8월</li>
-                    <li>9월</li>
-                    <li>10월</li>
-                    <li>11월</li>
-                    <li>12월</li>
-                </ul>
-                <div class="highLight">
-                    <div class="highLight__inner"></div>
-                </div>
-            </div>
             <div class="day">
                 <ul class="options">
                     <li>1일</li>
@@ -111,15 +54,7 @@
         <script>
             const now = new Date();
             const count = 20;
-            let yearSelector, monthSelector, daySelector;
-
-            // year
-            const year = document.querySelector('.year');
-            const yearItems = year.querySelectorAll('.options li');
-
-            // month
-            const month = document.querySelector('.month');
-            const monthItems = month.querySelectorAll('.options li');
+            let daySelector;
 
             // day
             const day = document.querySelector('.day');
@@ -138,24 +73,6 @@
                     li.setAttribute('data-value', number);
                 });
             };
-
-            // year
-            createItemStyle(yearItems);
-            yearSelector = new IosSelector({
-                el: year,
-                source: yearItems,
-                count,
-            });
-            yearSelector.select(now.getFullYear());
-
-            // month
-            createItemStyle(monthItems);
-            monthSelector = new IosSelector({
-                el: month,
-                source: monthItems,
-                count,
-            });
-            monthSelector.select(now.getMonth() + 1);
 
             // day
             createItemStyle(dayItems);

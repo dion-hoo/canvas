@@ -44,7 +44,7 @@ class IosSelector {
         this.mouse = {
             moveY: 0,
             offsetY: 0,
-            moveToScroll: 0,
+            finalScroll: 0,
             isDown: false,
         };
 
@@ -65,6 +65,10 @@ class IosSelector {
         this.mouse.moveY = 0;
         this.mouse.offsetY = event.clientY || event.touches[0].clientY;
         this.mouse.isDown = true;
+
+        this.mouse.finalScroll = this.scroll;
+
+        this.stop();
     }
 
     touchmove(event) {
@@ -83,28 +87,14 @@ class IosSelector {
                 moveToScroll = this.source.length + (moveToScroll - this.source.length) * 0.1;
             }
 
-            this.mouse.moveToScroll = this.moveTo(moveToScroll);
+            this.mouse.finalScroll = this.moveTo(moveToScroll);
         }
     }
 
     touchend() {
         this.mouse.isDown = false;
-
-        const finalScroll = this.mouse.moveToScroll;
-
+        const finalScroll = this.mouse.finalScroll;
         this.scroll = finalScroll;
-    }
-
-    touchToScroll(force) {
-        let initScroll = this.scroll;
-        let finalScroll;
-        let moveScroll;
-
-        finalScroll = Math.round(this.scroll + force);
-        finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
-        moveScroll = finalScroll - initScroll;
-
-        this.animateToScroll(initScroll, finalScroll, moveScroll);
     }
 
     moveTo(scroll) {
@@ -121,7 +111,7 @@ class IosSelector {
         return scroll;
     }
 
-    animateToScroll(initScroll, finalScroll, velocity, easingName = 'easeOutExpo') {
+    animateToScroll(initScroll, finalScroll, velocity, easingName = 'easeOutBounce') {
         let scrollLength = finalScroll - initScroll;
         let startTimeStamp = new Date().getTime() / 1000; // second
         // 타임 스탬프 값을 얻는다. 타임스탬프란 현재 시간을 밀리 세컨드 단위로 변환하여 보여주는 것
@@ -132,14 +122,29 @@ class IosSelector {
         // 그리고 시, 분,초 로 하게 되면 24시간이 지나면 1로 되고, 60분이 지나면 1로 되어서 계산하기가 힘들다.
 
         const tick = () => {
-            let endTimeStamp = new Date().getTime() / 1000 - startTimeStamp; // 밀리세컨트를 초로 변경해서 1초 2초 3초 이거를 구하기 위해서이다.
+            let endTimeStamp = new Date().getTime() / 1000 - startTimeStamp;
+            // 밀리세컨트를 뺀다.
+            // 쉽게 얘기해서 처음 (startTimeStamp)밀리세컨트에서 endTimeStamp를 계속 빼면서
+            // second(초)로 얘기하면 1초, 2초 ,3초 이렇게 지나가는 초를 구하기 위해서이다.
 
             if (endTimeStamp < velocity) {
+                // endTimeStamp / velocity게 하는 이유는
+                // endTimeStamp를 지금 second(초)로 바꾸었다.
+                // 그리고 velocity 1초당 이동해야할 속도를 구해노았다.
+
+                // 그러면 예를 들어 endTimeStamp = 1s, 2s, 3s 이렇게 시간이 지날때
+                // velocity = 지금 날짜를 기준으로(29일) 인덱스 번호로는 28이 들어오고
+                // 28까지의 거리는 10초동안 이동하려면 1초에 2.8m/s다.
+                // 여기서 endTimeStamp / velocity => 1s / 2.8m/s 이렇게 되고, 같은 's'를 지우면
+                // 1 / 2.8m 가 되고 거리를 구할 수가 있다. 그 거리를 easing props값으로 넘기면 된다.
+                // easing 공식홈페이지에 보면 props(변수 x)의 범위 0~1사이의 움직임 진척도이기 때문에
+                // 시간이 2.8 즉 velocity보다 작을때 까지의 거리만 구해주고, 나머지는 곱하기 이동해야할 거리를 곱해주면
+                // 0 ~ 1 사이의 거리에서 * 거리(scrollLength) 하면  0 ~ scrollLength까지의 easing값이 된다!!!
                 this.scroll = this.moveTo(initScroll + easing[easingName](endTimeStamp / velocity) * scrollLength);
                 this.cancelAnimation = requestAnimationFrame(tick);
             } else {
                 this.scroll = this.moveTo(initScroll + scrollLength);
-                this.cancelAnimation = cancelAnimationFrame(tick);
+                this.stop();
             }
         };
         tick();
