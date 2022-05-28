@@ -130,7 +130,7 @@ class IosSelector {
             if (endTimeStamp < velocity) {
                 // endTimeStamp / velocity게 하는 이유는
                 // endTimeStamp를 지금 second(초)로 바꾸었다.
-                // 그리고 velocity 1초당 이동해야할 속도를 구해노았다.
+                // 그리고 velocity 1초당 이동해야할 속도를 구해놓았다.
 
                 // 그러면 예를 들어 endTimeStamp = 1s, 2s, 3s 이렇게 시간이 지날때
                 // velocity = 지금 날짜를 기준으로(29일) 인덱스 번호로는 28이 들어오고
