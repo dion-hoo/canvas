@@ -65,6 +65,7 @@ class IosSelector {
         this.mouse.moveY = 0;
         this.mouse.offsetY = event.clientY || event.touches[0].clientY;
         this.mouse.isDown = true;
+        this.startTimeStamp = new Date().getTime() / 1000;
 
         this.mouse.finalScroll = this.scroll;
 
@@ -76,6 +77,7 @@ class IosSelector {
             let eventY = event.clientY || event.touches[0].clientY;
 
             this.mouse.moveY = (this.mouse.offsetY - eventY) / 45;
+            this.endTimeStamp = new Date().getTime() / 1000;
 
             let moveToScroll = this.mouse.moveY + this.scroll;
 
@@ -93,8 +95,15 @@ class IosSelector {
 
     touchend() {
         this.mouse.isDown = false;
-        const finalScroll = this.mouse.finalScroll;
-        this.scroll = finalScroll;
+        this.scroll = this.mouse.finalScroll;
+
+        // 시간 마우스 터치하고 움직이고 뗄때의 시간을 가지고 온다.
+        const timeLapse = this.endTimeStamp - this.startTimeStamp;
+        const startY = this.scroll;
+        const endY = 10;
+        const velocity = (endY - startY) / timeLapse;
+
+        this.animateToScroll(startY, endY, velocity);
     }
 
     moveTo(scroll) {
@@ -111,7 +120,13 @@ class IosSelector {
         return scroll;
     }
 
-    animateToScroll(initScroll, finalScroll, velocity, easingName = 'easeOutBounce') {
+    animateToScroll(initScroll, finalScroll, velocity, easingName = 'easeOutExpo') {
+        // if (initScroll === finalScroll || velocity === 0) {
+        //     // 살짝 움직였다가 뗐을 경우 그 자리
+        //     this.moveTo(initScroll);
+        //     return;
+        // }
+
         let scrollLength = finalScroll - initScroll;
         let startTimeStamp = new Date().getTime() / 1000; // second
         // 타임 스탬프 값을 얻는다. 타임스탬프란 현재 시간을 밀리 세컨드 단위로 변환하여 보여주는 것
@@ -135,9 +150,9 @@ class IosSelector {
                 // 그러면 예를 들어 endTimeStamp = 1s, 2s, 3s 이렇게 시간이 지날때
                 // velocity = 지금 날짜를 기준으로(29일) 인덱스 번호로는 28이 들어오고
                 // 28까지의 거리는 10초동안 이동하려면 1초에 2.8m/s다.
-                // 여기서 endTimeStamp / velocity => 1s / 2.8m/s 이렇게 되고, 같은 's'를 지우면
-                // 1 / 2.8m 가 되고 거리를 구할 수가 있다. 그 거리를 easing props값으로 넘기면 된다.
                 // easing 공식홈페이지에 보면 props(변수 x)의 범위 0~1사이의 움직임 진척도이기 때문에
+                // 1 * 2.8m 가 아니라 1 / 2.8m 나누어서 '움직임에 대한 진척도를 구하기 위해서다.'
+                // 그 거리를 easing props값으로 넘기면 된다.
                 // 시간이 2.8 즉 velocity보다 작을때 까지의 거리만 구해주고, 나머지는 곱하기 이동해야할 거리를 곱해주면
                 // 0 ~ 1 사이의 거리에서 * 거리(scrollLength) 하면  0 ~ scrollLength까지의 easing값이 된다!!!
                 this.scroll = this.moveTo(initScroll + easing[easingName](endTimeStamp / velocity) * scrollLength);
@@ -160,7 +175,7 @@ class IosSelector {
                 const initScroll = this.scroll;
                 const finalScroll = i;
                 const moveScroll = Math.abs(finalScroll - initScroll);
-                const velocity = moveScroll / 10; // 도달 위치를 10초안에 이동을 해야한다.
+                const velocity = moveScroll / 8; // 도달 위치를 10초안에 이동을 해야한다.
                 // 그래서 1초에 이동할 속도를 구한다.
 
                 this.animateToScroll(initScroll, finalScroll, velocity);

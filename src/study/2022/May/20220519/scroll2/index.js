@@ -63,6 +63,10 @@ class IosSelector {
             startY: 0,
             yArr: [],
         };
+        this.touchData2 = {
+            startY: 0,
+            yArr: [],
+        };
 
         for (let eventName in this.events) {
             this.events[eventName] = ((eventName) => {
@@ -93,6 +97,7 @@ class IosSelector {
         let eventY = e.clientY || e.touches[0].clientY;
         touchData.startY = eventY;
         touchData.yArr = [[eventY, new Date().getTime()]];
+        this.touchData2.yArr = [[eventY, 'start']];
         touchData.touchScroll = this.scroll;
         this._stop();
     }
@@ -100,6 +105,7 @@ class IosSelector {
     _touchmove(e, touchData) {
         let eventY = e.clientY || e.touches[0].clientY;
         touchData.yArr.push([eventY, new Date().getTime()]);
+        this.touchData2.yArr.push([eventY, 'move']);
         if (touchData.length > 5) {
             touchData.unshift();
         }
@@ -132,10 +138,17 @@ class IosSelector {
         if (touchData.yArr.length === 1) {
             v = 0;
         } else {
+            let startTime2 = this.touchData2.yArr[touchData.yArr.length - 2][1];
+            let endTime2 = this.touchData2.yArr[touchData.yArr.length - 1][1];
             let startTime = touchData.yArr[touchData.yArr.length - 2][1];
             let endTime = touchData.yArr[touchData.yArr.length - 1][1];
             let startY = touchData.yArr[touchData.yArr.length - 2][0];
             let endY = touchData.yArr[touchData.yArr.length - 1][0];
+
+            console.log(touchData);
+
+            console.log(startY - endY);
+            console.log(endTime - startTime);
 
             // 计算速度
             v = (((startY - endY) / this.itemHeight) * 1000) / (endTime - startTime);
@@ -358,8 +371,6 @@ class IosSelector {
         let start = new Date().getTime() / 1000;
         let pass = 0;
         let totalScrollLen = finalScroll - initScroll;
-
-        console.log(start);
 
         // console.log(initScroll, totalScrollLen);
 

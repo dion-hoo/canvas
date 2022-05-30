@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            html,
+            body {
+                overflow: hidden;
+                background-color: #000;
+            }
+
+            .box {
+                position: absolute;
+                top: 50%;
+                width: 100px;
+                height: 100px;
+                border: 1px solid red;
+                transform: translateY(-50%);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="box"></div>
+        <script>
+            const box = document.querySelector('.box');
+            let position = 0;
+
+            const easeOutBounce = (x) => {
+                const n1 = 7.5625;
+                const d1 = 2.75;
+
+                if (x < 1 / d1) {
+                    return n1 * x * x;
+                } else if (x < 2 / d1) {
+                    return n1 * (x -= 1.5 / d1) * x + 0.75;
+                } else if (x < 2.5 / d1) {
+                    return n1 * (x -= 2.25 / d1) * x + 0.9375;
+                } else {
+                    return n1 * (x -= 2.625 / d1) * x + 0.984375;
+                }
+            };
+
+            const animate = () => {
+                box.style.transform = `translate(${easeOutBounce(position)}px, -50%)`;
+
+                position++;
+
+                if (position > innerWidth - 100) return;
+
+                requestAnimationFrame(animate);
+            };
+
+            animate();
+        </script>
+    </body>
+</html>

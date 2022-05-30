@@ -1,0 +1,17 @@
+@font-face {
+    font-family: HindSemiBold;
+    font-weight: 600;
+    src: url(./Hind-SemiBold.ttf);
+}
+
+@font-face {
+    font-family: HindBold;
+    font-weight: 700;
+    src: url(./Hind-Bold.ttf);
+}
+
+@font-face {
+    font-family: HindLight;
+    font-weight: 400;
+    src: url(./Hind-Light.ttf);
+}
