@@ -44,7 +44,7 @@ class IosSelector {
         this.mouse = {
             moveY: 0,
             offsetY: 0,
-            finalScroll: 0,
+            endScroll: 0,
             isDown: false,
         };
 
@@ -65,10 +65,16 @@ class IosSelector {
         this.mouse.moveY = 0;
         this.mouse.offsetY = event.clientY || event.touches[0].clientY;
         this.mouse.isDown = true;
+
+        // 움직임 거리
+        this.moveDistance = 0;
+
         this.startTimeStamp = new Date().getTime() / 1000;
+        this.endTimeStamp = 0;
 
-        this.mouse.finalScroll = this.scroll;
+        this.mouse.endScroll = this.scroll;
 
+        // 클릭 시 바로 정지
         this.stop();
     }
 
@@ -76,34 +82,52 @@ class IosSelector {
         if (this.mouse.isDown) {
             let eventY = event.clientY || event.touches[0].clientY;
 
-            this.mouse.moveY = (this.mouse.offsetY - eventY) / 45;
             this.endTimeStamp = new Date().getTime() / 1000;
+            this.mouse.moveY = (this.mouse.offsetY - eventY) / 45;
+            this.moveDistance = this.mouse.moveY;
 
             let moveToScroll = this.mouse.moveY + this.scroll;
 
             if (moveToScroll < 0) {
                 // 처음일때
-                moveToScroll *= 0.1;
+                moveToScroll *= 0.2;
             } else if (moveToScroll > this.source.length) {
                 // 제일 끝일때
-                moveToScroll = this.source.length + (moveToScroll - this.source.length) * 0.1;
+                moveToScroll = this.source.length + this.source.length * 0.01;
             }
 
-            this.mouse.finalScroll = this.moveTo(moveToScroll);
+            this.mouse.endScroll = this.moveTo(moveToScroll);
         }
     }
 
     touchend() {
         this.mouse.isDown = false;
-        this.scroll = this.mouse.finalScroll;
+        this.scroll = this.mouse.endScroll;
+        let velocity = 0;
 
-        // 시간 마우스 터치하고 움직이고 뗄때의 시간을 가지고 온다.
-        const timeLapse = this.endTimeStamp - this.startTimeStamp;
-        const startY = this.scroll;
-        const endY = 10;
-        const velocity = (endY - startY) / timeLapse;
+        if (this.endTimeStamp === 0) {
+            velocity = 0;
+        } else {
+            velocity = this.moveDistance / (this.endTimeStamp - this.startTimeStamp);
 
-        this.animateToScroll(startY, endY, velocity);
+            const direction = velocity > 0 ? 1 : -1;
+
+            velocity = Math.abs(velocity) > 10 ? 0.9 * direction : velocity / 100;
+
+            // console.log(`속도 : ${velocity}`);
+        }
+
+        const distance = velocity * 8; // s = vt;
+
+        // console.log(`거리 : ${distance}`);
+
+        const initScroll = this.scroll;
+        let finalScroll = Math.round(initScroll + distance);
+        finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
+
+        const speed = Math.abs(velocity);
+
+        this.animateToScroll(initScroll, finalScroll, speed);
     }
 
     moveTo(scroll) {
@@ -121,12 +145,6 @@ class IosSelector {
     }
 
     animateToScroll(initScroll, finalScroll, velocity, easingName = 'easeOutExpo') {
-        // if (initScroll === finalScroll || velocity === 0) {
-        //     // 살짝 움직였다가 뗐을 경우 그 자리
-        //     this.moveTo(initScroll);
-        //     return;
-        // }
-
         let scrollLength = finalScroll - initScroll;
         let startTimeStamp = new Date().getTime() / 1000; // second
         // 타임 스탬프 값을 얻는다. 타임스탬프란 현재 시간을 밀리 세컨드 단위로 변환하여 보여주는 것
@@ -175,7 +193,7 @@ class IosSelector {
                 const initScroll = this.scroll;
                 const finalScroll = i;
                 const moveScroll = Math.abs(finalScroll - initScroll);
-                const velocity = moveScroll / 8; // 도달 위치를 10초안에 이동을 해야한다.
+                const velocity = moveScroll / 8; // 도달 위치를 8초안에 이동을 해야한다.
                 // 그래서 1초에 이동할 속도를 구한다.
 
                 this.animateToScroll(initScroll, finalScroll, velocity);

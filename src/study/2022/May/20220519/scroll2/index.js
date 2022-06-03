@@ -138,20 +138,18 @@ class IosSelector {
         if (touchData.yArr.length === 1) {
             v = 0;
         } else {
-            let startTime2 = this.touchData2.yArr[touchData.yArr.length - 2][1];
-            let endTime2 = this.touchData2.yArr[touchData.yArr.length - 1][1];
             let startTime = touchData.yArr[touchData.yArr.length - 2][1];
             let endTime = touchData.yArr[touchData.yArr.length - 1][1];
             let startY = touchData.yArr[touchData.yArr.length - 2][0];
             let endY = touchData.yArr[touchData.yArr.length - 1][0];
 
-            console.log(touchData);
-
-            console.log(startY - endY);
-            console.log(endTime - startTime);
+            // console.log(touchData);
+            // console.log(endTime - startTime);
 
             // 计算速度
             v = (((startY - endY) / this.itemHeight) * 1000) / (endTime - startTime);
+
+            console.log(v);
             let sign = v > 0 ? 1 : -1;
 
             v = Math.abs(v) > 30 ? 30 * sign : v;
