@@ -146,6 +146,7 @@
                 el: year,
                 source: yearItems,
                 count,
+                initScroll: 10,
             });
             yearSelector.select(now.getFullYear());
 
@@ -155,6 +156,7 @@
                 el: month,
                 source: monthItems,
                 count,
+                initScroll: 10,
             });
             monthSelector.select(now.getMonth() + 1);
 
@@ -164,6 +166,7 @@
                 el: day,
                 source: dayItems,
                 count,
+                initScroll: 30,
             });
             daySelector.select(now.getDate());
         </script>

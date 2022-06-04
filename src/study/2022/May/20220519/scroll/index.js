@@ -40,7 +40,7 @@ class IosSelector {
         this.itemAngle = 360 / this.count;
         this.cancelAnimation = null;
         this.half = 7;
-        this.scroll = 0;
+        this.scroll = options.initScroll ?? 0;
         this.mouse = {
             moveY: 0,
             offsetY: 0,
@@ -52,16 +52,22 @@ class IosSelector {
     }
 
     init() {
-        this.el.addEventListener('touchstart', this.touchstart.bind(this));
-        this.el.addEventListener('touchmove', this.touchmove.bind(this));
-        this.el.addEventListener('touchend', this.touchend.bind(this));
+        this.el.addEventListener('touchstart', this.onStart.bind(this));
+        this.el.addEventListener('touchmove', this.onMove.bind(this));
+        this.el.addEventListener('touchend', this.onEnd.bind(this));
 
-        this.el.addEventListener('mousedown', this.touchstart.bind(this));
-        this.el.addEventListener('mousemove', this.touchmove.bind(this));
-        this.el.addEventListener('mouseup', this.touchend.bind(this));
+        this.el.addEventListener('click', this.onClick.bind(this));
+        this.el.addEventListener('mousedown', this.onStart.bind(this));
+        this.el.addEventListener('mousemove', this.onMove.bind(this));
+        this.el.addEventListener('mouseup', this.onEnd.bind(this));
     }
 
-    touchstart(event) {
+    onClick(event) {
+        console.log(event);
+        console.log('click');
+    }
+
+    onStart(event) {
         this.mouse.moveY = 0;
         this.mouse.offsetY = event.clientY || event.touches[0].clientY;
         this.mouse.isDown = true;
@@ -78,7 +84,7 @@ class IosSelector {
         this.stop();
     }
 
-    touchmove(event) {
+    onMove(event) {
         if (this.mouse.isDown) {
             let eventY = event.clientY || event.touches[0].clientY;
 
@@ -90,29 +96,28 @@ class IosSelector {
 
             if (moveToScroll < 0) {
                 // 처음일때
-                moveToScroll *= 0.2;
+                moveToScroll *= 0.3;
+
+                console.log(moveToScroll);
             } else if (moveToScroll > this.source.length) {
                 // 제일 끝일때
-                moveToScroll = this.source.length + this.source.length * 0.01;
+                moveToScroll = this.source.length + (moveToScroll - this.source.length - 1) * 0.2;
             }
 
             this.mouse.endScroll = this.moveTo(moveToScroll);
         }
     }
 
-    touchend() {
+    onEnd() {
         this.mouse.isDown = false;
         this.scroll = this.mouse.endScroll;
         let velocity = 0;
 
-        if (this.endTimeStamp === 0) {
-            velocity = 0;
-        } else {
+        if (this.endTimeStamp !== 0) {
             velocity = this.moveDistance / (this.endTimeStamp - this.startTimeStamp);
-
             const direction = velocity > 0 ? 1 : -1;
 
-            velocity = Math.abs(velocity) > 10 ? 0.9 * direction : velocity / 100;
+            velocity = Math.abs(velocity) > 20 ? 0.9 * direction : Math.abs(velocity) > 10 ? velocity / 10 : velocity / 100;
 
             // console.log(`속도 : ${velocity}`);
         }
