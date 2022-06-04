@@ -137,6 +137,7 @@
 
                     li.style.transform = `rotateX(-${rotate * index}deg) translate3d(0, 0, ${distance}px)`;
                     li.setAttribute('data-value', number);
+                    li.setAttribute('data-index', index);
                 });
             };
 
@@ -147,6 +148,7 @@
                 source: yearItems,
                 count,
                 initScroll: 10,
+                isClick: false,
             });
             yearSelector.select(now.getFullYear());
 

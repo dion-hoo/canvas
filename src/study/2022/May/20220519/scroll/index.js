@@ -41,12 +41,23 @@ class IosSelector {
         this.cancelAnimation = null;
         this.half = 7;
         this.scroll = options.initScroll ?? 0;
+        this.isClick = options.isClick ?? true;
+
         this.mouse = {
             moveY: 0,
             offsetY: 0,
             endScroll: 0,
             isDown: false,
+            isMove: false,
         };
+
+        const list = this.el.querySelector('.options');
+        const target = [...list.children][0];
+        const regex = /\D+/gi;
+        const style = getComputedStyle(target).height;
+        const height = style.replace(regex, '');
+
+        this.height = height;
 
         this.init();
     }
@@ -65,14 +76,23 @@ class IosSelector {
     }
 
     onClick(event) {
-        console.log(event);
-        console.log('click');
+        const { index } = event.target.dataset;
+
+        if (index && !this.mouse.isMove && this.isClick) {
+            const initScroll = this.scroll;
+            const finalScroll = +index;
+            const moveScroll = Math.abs(finalScroll - initScroll);
+            const velocity = moveScroll / 5;
+
+            this.animateToScroll(initScroll, finalScroll, velocity);
+        }
     }
 
     onStart(event) {
         this.mouse.moveY = 0;
         this.mouse.offsetY = event.clientY || event.touches[0].clientY;
         this.mouse.isDown = true;
+        this.mouse.isMove = false;
 
         // 움직임 거리
         this.moveDistance = 0;
@@ -90,8 +110,9 @@ class IosSelector {
         if (this.mouse.isDown) {
             let eventY = event.clientY || event.touches[0].clientY;
 
+            this.mouse.isMove = true;
             this.endTimeStamp = new Date().getTime() / 1000;
-            this.mouse.moveY = (this.mouse.offsetY - eventY) / 45;
+            this.mouse.moveY = (this.mouse.offsetY - eventY) / this.height;
             this.moveDistance = this.mouse.moveY;
 
             let moveToScroll = this.mouse.moveY + this.scroll;
@@ -99,8 +120,6 @@ class IosSelector {
             if (moveToScroll < 0) {
                 // 처음일때
                 moveToScroll *= 0.3;
-
-                console.log(moveToScroll);
             } else if (moveToScroll > this.source.length) {
                 // 제일 끝일때
                 moveToScroll = this.source.length + (moveToScroll - this.source.length - 1) * 0.2;
@@ -119,7 +138,7 @@ class IosSelector {
             velocity = this.moveDistance / (this.endTimeStamp - this.startTimeStamp);
             const direction = velocity > 0 ? 1 : -1;
 
-            velocity = Math.abs(velocity) > 20 ? 0.9 * direction : Math.abs(velocity) > 10 ? velocity / 10 : velocity / 100;
+            velocity = Math.abs(velocity) > 10 ? 2.5 * direction : velocity / 10;
 
             // console.log(`속도 : ${velocity}`);
         }
@@ -193,6 +212,8 @@ class IosSelector {
     stop() {
         cancelAnimationFrame(this.cancelAnimation);
     }
+
+    // 마우스를 누른상태에서 꾹 위로 올리거나 내릴때 한참 있다가 떼면 그 자리에 위치 해야 하는데 움직인다. 이거 수정해야함!
 
     select(value) {
         for (let i = 0; i < this.source.length; i++) {
