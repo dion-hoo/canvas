@@ -144,12 +144,13 @@ class IosSelector {
             let endY = touchData.yArr[touchData.yArr.length - 1][0];
 
             // console.log(touchData);
-            // console.log(endTime - startTime);
+            // console.log(startY, endY);
 
             // 计算速度
             v = (((startY - endY) / this.itemHeight) * 1000) / (endTime - startTime);
 
-            console.log(v);
+            // console.log(v);
+
             let sign = v > 0 ? 1 : -1;
 
             v = Math.abs(v) > 30 ? 30 * sign : v;

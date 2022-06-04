@@ -41,7 +41,7 @@ class IosSelector {
         this.cancelAnimation = null;
         this.half = 7;
         this.scroll = options.initScroll ?? 0;
-        this.isClick = options.isClick ?? true;
+        this.isClick = options.isClick ?? false;
 
         this.mouse = {
             moveY: 0,
@@ -77,12 +77,15 @@ class IosSelector {
 
     onClick(event) {
         const { index } = event.target.dataset;
+        const { isMove } = this.mouse;
 
-        if (index && !this.mouse.isMove && this.isClick) {
+        if (index && !isMove && this.isClick) {
             const initScroll = this.scroll;
             const finalScroll = +index;
             const moveScroll = Math.abs(finalScroll - initScroll);
             const velocity = moveScroll / 5;
+
+            console.log('click');
 
             this.animateToScroll(initScroll, finalScroll, velocity);
         }
@@ -138,7 +141,7 @@ class IosSelector {
             velocity = this.moveDistance / (this.endTimeStamp - this.startTimeStamp);
             const direction = velocity > 0 ? 1 : -1;
 
-            velocity = Math.abs(velocity) > 10 ? 2.5 * direction : velocity / 10;
+            velocity = Math.abs(velocity) > 10 ? 0.9 * direction : velocity / 10;
 
             // console.log(`속도 : ${velocity}`);
         }
