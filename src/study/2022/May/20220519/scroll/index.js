@@ -137,13 +137,19 @@ class IosSelector {
         this.scroll = this.mouse.endScroll;
         let velocity = 0;
 
-        if (this.endTimeStamp !== 0) {
-            velocity = this.moveDistance / (this.endTimeStamp - this.startTimeStamp);
-            const direction = velocity > 0 ? 1 : -1;
+        console.log(this.endTimeStamp - this.startTimeStamp);
 
-            velocity = Math.abs(velocity) > 10 ? 0.9 * direction : velocity / 10;
+        if (this.endTimeStamp - this.startTimeStamp > 0.15) {
+            velocity = 0;
+        } else {
+            if (this.endTimeStamp !== 0) {
+                velocity = this.moveDistance / (this.endTimeStamp - this.startTimeStamp);
+                const direction = velocity > 0 ? 1 : -1;
 
-            // console.log(`속도 : ${velocity}`);
+                velocity = Math.abs(velocity) > 10 ? 0.9 * direction : velocity / 10;
+
+                // console.log(`속도 : ${velocity}`);
+            }
         }
 
         const distance = velocity * 8; // s = vt;
@@ -215,8 +221,6 @@ class IosSelector {
     stop() {
         cancelAnimationFrame(this.cancelAnimation);
     }
-
-    // 마우스를 누른상태에서 꾹 위로 올리거나 내릴때 한참 있다가 떼면 그 자리에 위치 해야 하는데 움직인다. 이거 수정해야함!
 
     select(value) {
         for (let i = 0; i < this.source.length; i++) {
