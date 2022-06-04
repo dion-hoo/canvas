@@ -60,6 +60,8 @@ class IosSelector {
         this.el.addEventListener('mousedown', this.onStart.bind(this));
         this.el.addEventListener('mousemove', this.onMove.bind(this));
         this.el.addEventListener('mouseup', this.onEnd.bind(this));
+
+        this.moveTo(this.scroll);
     }
 
     onClick(event) {
