@@ -32,16 +32,20 @@ const easing = {
     },
 };
 
-class IosSelector {
+class Rolldate {
     constructor(options) {
-        this.el = options.el;
+        this.el = options.trigger;
         this.source = options.source;
         this.count = options.count - (options.count % 4);
         this.itemAngle = 360 / this.count;
         this.cancelAnimation = null;
         this.half = 7;
-        this.scroll = options.initScroll ?? 0;
-        this.isClick = options.isClick ?? false;
+
+        this.initDateIndex = options.initDateIndex ?? 0;
+        this.scroll = this.initDateIndex;
+        this.startDate = options.startDate;
+        this.isPicker = options.isPicker ?? false;
+        this.isAnimation = options.isAnimation ?? true;
 
         this.mouse = {
             moveY: 0,
@@ -72,14 +76,30 @@ class IosSelector {
         this.el.addEventListener('mousemove', this.onMove.bind(this));
         this.el.addEventListener('mouseup', this.onEnd.bind(this));
 
-        this.moveTo(this.scroll);
+        if (this.isAnimation) {
+            this.onSelect(this.startDate);
+        } else {
+            this.scroll = 0;
+
+            for (let i = 0; i < this.source.length; i++) {
+                if (+this.source[i].dataset.value === this.startDate) {
+                    const initScroll = this.scroll;
+                    const finalScroll = i;
+                    const moveScroll = Math.abs(finalScroll - initScroll);
+
+                    this.scroll = this.moveTo(moveScroll);
+
+                    break;
+                }
+            }
+        }
     }
 
     onClick(event) {
         const { index } = event.target.dataset;
         const { isMove } = this.mouse;
 
-        if (index && !isMove && this.isClick) {
+        if (index && !isMove && this.isPicker) {
             const initScroll = this.scroll;
             const finalScroll = +index;
             const moveScroll = Math.abs(finalScroll - initScroll);
@@ -136,8 +156,6 @@ class IosSelector {
         this.mouse.isDown = false;
         this.scroll = this.mouse.endScroll;
         let velocity = 0;
-
-        console.log(this.endTimeStamp - this.startTimeStamp);
 
         if (this.endTimeStamp - this.startTimeStamp > 0.15) {
             velocity = 0;
@@ -222,7 +240,11 @@ class IosSelector {
         cancelAnimationFrame(this.cancelAnimation);
     }
 
-    select(value) {
+    onChange() {
+        return this.scroll;
+    }
+
+    onSelect(value) {
         for (let i = 0; i < this.source.length; i++) {
             if (+this.source[i].dataset.value === value) {
                 const initScroll = this.scroll;
@@ -233,7 +255,7 @@ class IosSelector {
 
                 this.animateToScroll(initScroll, finalScroll, velocity);
 
-                return;
+                break;
             }
         }
     }

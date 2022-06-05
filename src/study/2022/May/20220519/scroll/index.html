@@ -143,34 +143,38 @@
 
             // year
             createItemStyle(yearItems);
-            yearSelector = new IosSelector({
-                el: year,
+            yearSelector = new Rolldate({
+                trigger: year,
                 source: yearItems,
                 count,
-                initScroll: 10,
+                initDateIndex: 15,
+                startDate: now.getFullYear(),
+                onChange: (value) => {
+                    console.log(value);
+                },
             });
-            yearSelector.select(now.getFullYear());
 
             // month
             createItemStyle(monthItems);
-            monthSelector = new IosSelector({
-                el: month,
+            monthSelector = new Rolldate({
+                trigger: month,
                 source: monthItems,
                 count,
-                initScroll: 10,
-                isClick: true,
+                startDate: now.getMonth() + 1,
+                isPicker: true,
+                onChange: (value) => {},
             });
-            monthSelector.select(now.getMonth() + 1);
 
             // day
             createItemStyle(dayItems);
-            daySelector = new IosSelector({
-                el: day,
+            daySelector = new Rolldate({
+                trigger: day,
                 source: dayItems,
                 count,
-                initScroll: 30,
+                initDateIndex: 20,
+                startDate: now.getDate(),
+                onChange: (value) => {},
             });
-            daySelector.select(now.getDate());
         </script>
     </body>
 </html>
