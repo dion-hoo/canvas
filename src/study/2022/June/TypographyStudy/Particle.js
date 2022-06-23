@@ -28,7 +28,7 @@ export class Particle {
         this.y += this.vy;
 
         // color
-        this.rgb += (this.rgb - this.saveRgb) * COLOR_SPEED;
+        this.rgb = this.rgb + (this.rgb - this.saveRgb) * COLOR_SPEED;
 
         const red = ((this.rgb >> 16) & 0xff) | 0;
         const green = ((this.rgb >> 8) & 0xff) | 0;

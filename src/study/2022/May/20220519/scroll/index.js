@@ -30,6 +30,22 @@ const easing = {
             ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2
             : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;
     },
+    easeInOutBack: (x) => {
+        const c1 = 1.70158;
+        const c2 = c1 * 1.525;
+
+        return x < 0.5
+            ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+            : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+    },
+    easeOutElastic: (x) => {
+        const c4 = (2 * Math.PI) / 3;
+
+        return x === 0 ? 0 : x === 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+    },
+    easeOutQuart: (x) => {
+        return 1 - Math.pow(1 - x, 4);
+    },
 };
 
 class Rolldate {
@@ -117,8 +133,7 @@ class Rolldate {
         this.mouse.isDown = true;
         this.mouse.isMove = false;
 
-        // 움직임 거리
-        this.moveDistance = 0;
+        this.startY = event.clientY || event.touches[0].clientY;
 
         this.startTimeStamp = new Date().getTime() / 1000;
         this.endTimeStamp = 0;
@@ -135,8 +150,9 @@ class Rolldate {
 
             this.mouse.isMove = true;
             this.endTimeStamp = new Date().getTime() / 1000;
-            this.mouse.moveY = (this.mouse.offsetY - eventY) / this.height;
-            this.moveDistance = this.mouse.moveY;
+            this.mouse.moveY = (eventY - this.mouse.offsetY) / this.height;
+
+            this.endY = eventY;
 
             let moveToScroll = this.mouse.moveY + this.scroll;
 
@@ -157,30 +173,20 @@ class Rolldate {
         this.scroll = this.mouse.endScroll;
         let velocity = 0;
 
-        if (this.endTimeStamp - this.startTimeStamp > 0.15) {
-            velocity = 0;
-        } else {
-            if (this.endTimeStamp !== 0) {
-                velocity = this.moveDistance / (this.endTimeStamp - this.startTimeStamp);
-                const direction = velocity > 0 ? 1 : -1;
-
-                velocity = Math.abs(velocity) > 10 ? 0.9 * direction : velocity / 10;
-
-                // console.log(`속도 : ${velocity}`);
-            }
+        if (this.endTimeStamp !== 0) {
+            velocity = (this.endY - this.startY) / this.height / (this.endTimeStamp - this.startTimeStamp);
         }
 
-        const distance = velocity * 8; // s = vt;
-
-        // console.log(`거리 : ${distance}`);
-
+        const distance = velocity * 0.8;
         const initScroll = this.scroll;
-        let finalScroll = Math.round(initScroll + distance);
+        let finalScroll = Math.round(this.scroll + distance);
+
         finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
 
-        const speed = Math.abs(velocity);
+        const totalScrollLen = finalScroll - initScroll;
+        const time = Math.abs(totalScrollLen / 8);
 
-        this.animateToScroll(initScroll, finalScroll, speed);
+        this.animateToScroll(initScroll, finalScroll, time);
     }
 
     moveTo(scroll) {
@@ -197,7 +203,7 @@ class Rolldate {
         return scroll;
     }
 
-    animateToScroll(initScroll, finalScroll, velocity, easingName = 'easeOutExpo') {
+    animateToScroll(initScroll, finalScroll, time, easingName = 'easeOutExpo') {
         let scrollLength = finalScroll - initScroll;
         let startTimeStamp = new Date().getTime() / 1000; // second
         // 타임 스탬프 값을 얻는다. 타임스탬프란 현재 시간을 밀리 세컨드 단위로 변환하여 보여주는 것
@@ -213,7 +219,7 @@ class Rolldate {
             // 쉽게 얘기해서 처음 (startTimeStamp)밀리세컨트에서 endTimeStamp를 계속 빼면서
             // second(초)로 얘기하면 1초, 2초 ,3초 이렇게 지나가는 초를 구하기 위해서이다.
 
-            if (endTimeStamp < velocity) {
+            if (endTimeStamp < time) {
                 // endTimeStamp / velocity게 하는 이유는
                 // endTimeStamp를 지금 second(초)로 바꾸었다.
                 // 그리고 velocity 1초당 이동해야할 속도를 구해놓았다.
@@ -226,7 +232,7 @@ class Rolldate {
                 // 그 거리를 easing props값으로 넘기면 된다.
                 // 시간이 2.8 즉 velocity보다 작을때 까지의 거리만 구해주고, 나머지는 곱하기 이동해야할 거리를 곱해주면
                 // 0 ~ 1 사이의 거리에서 * 거리(scrollLength) 하면  0 ~ scrollLength까지의 easing값이 된다!!!
-                this.scroll = this.moveTo(initScroll + easing[easingName](endTimeStamp / velocity) * scrollLength);
+                this.scroll = this.moveTo(initScroll + easing[easingName](endTimeStamp / time) * scrollLength);
                 this.cancelAnimation = requestAnimationFrame(tick);
             } else {
                 this.scroll = this.moveTo(initScroll + scrollLength);
@@ -250,10 +256,10 @@ class Rolldate {
                 const initScroll = this.scroll;
                 const finalScroll = i;
                 const moveScroll = Math.abs(finalScroll - initScroll);
-                const velocity = moveScroll / 8; // 도달 위치를 8초안에 이동을 해야한다.
+                const time = moveScroll / 8; // 도달 위치를 8초안에 이동을 해야한다.
                 // 그래서 1초에 이동할 속도를 구한다.
 
-                this.animateToScroll(initScroll, finalScroll, velocity);
+                this.animateToScroll(initScroll, finalScroll, time);
 
                 break;
             }

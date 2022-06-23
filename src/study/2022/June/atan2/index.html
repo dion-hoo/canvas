@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <script>
+            const a = {
+                x: 100,
+                y: 300,
+            };
+            const b = {
+                x: 200,
+                y: 200,
+            };
+
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const angle = Math.atan(dy / dx);
+
+            console.log((angle * 180) / Math.PI);
+        </script>
+    </body>
+</html>
