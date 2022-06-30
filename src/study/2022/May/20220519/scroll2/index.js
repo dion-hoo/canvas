@@ -94,21 +94,18 @@ class IosSelector {
     _touchstart(e, touchData) {
         this.elems.el.addEventListener('touchmove', this.events.touchmove);
         document.addEventListener('mousemove', this.events.touchmove);
+
         let eventY = e.clientY || e.touches[0].clientY;
+
         touchData.startY = eventY;
-        touchData.yArr = [[eventY, new Date().getTime()]];
-        this.touchData2.yArr = [[eventY, 'start']];
         touchData.touchScroll = this.scroll;
         this._stop();
     }
 
     _touchmove(e, touchData) {
         let eventY = e.clientY || e.touches[0].clientY;
-        touchData.yArr.push([eventY, new Date().getTime()]);
-        this.touchData2.yArr.push([eventY, 'move']);
-        if (touchData.length > 5) {
-            touchData.unshift();
-        }
+
+        touchData.yArr.push([eventY, new Date().getTime() / 1000]);
 
         let scrollAdd = (touchData.startY - eventY) / this.itemHeight;
         let moveToScroll = scrollAdd + this.scroll;
@@ -143,13 +140,8 @@ class IosSelector {
             let startY = touchData.yArr[touchData.yArr.length - 2][0];
             let endY = touchData.yArr[touchData.yArr.length - 1][0];
 
-            // console.log(touchData);
-            // console.log(startY, endY);
-
             // 计算速度
-            v = (((startY - endY) / this.itemHeight) * 1000) / (endTime - startTime);
-
-            // console.log(v);
+            v = (startY - endY) / this.itemHeight / (endTime - startTime);
 
             let sign = v > 0 ? 1 : -1;
 
@@ -157,9 +149,67 @@ class IosSelector {
         }
 
         this.scroll = touchData.touchScroll;
+
         this._animateMoveByInitV(v);
 
         // console.log('end');
+    }
+
+    async _animateMoveByInitV(initV) {
+        // console.log(initV);
+
+        let initScroll;
+        let finalScroll;
+        let finalV;
+
+        let totalScrollLen;
+        let a;
+        let t;
+
+        initScroll = this.scroll;
+
+        a = initV > 0 ? -this.a : this.a; // 减速加速度
+        t = Math.abs(initV / a); // 速度减到 0 花费时间
+        totalScrollLen = initV * t + (a * t * t) / 2; // 总滚动长度
+        finalScroll = Math.round(this.scroll + totalScrollLen); // 取整，确保准确最终 scroll 为整数
+        finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
+
+        totalScrollLen = finalScroll - initScroll;
+        t = Math.sqrt(Math.abs(totalScrollLen / a));
+        await this._animateToScroll(this.scroll, finalScroll, t, 'easeOutQuart');
+
+        this._selectByScroll(this.scroll);
+    }
+
+    _animateToScroll(initScroll, finalScroll, t, easingName = 'easeOutQuart') {
+        if (initScroll === finalScroll || t === 0) {
+            this._moveTo(initScroll);
+            return;
+        }
+
+        let start = new Date().getTime() / 1000;
+        let pass = 0;
+        let totalScrollLen = finalScroll - initScroll;
+
+        // console.log(initScroll, totalScrollLen);
+
+        // console.log(initScroll, finalScroll, initV, finalV, a);
+        return new Promise((resolve, reject) => {
+            this.moving = true;
+            let tick = () => {
+                pass = new Date().getTime() / 1000 - start;
+
+                if (pass < t) {
+                    this.scroll = this._moveTo(initScroll + easing[easingName](pass / t) * totalScrollLen);
+                    this.moveT = requestAnimationFrame(tick);
+                } else {
+                    resolve();
+                    this._stop();
+                    this.scroll = this._moveTo(initScroll + totalScrollLen);
+                }
+            };
+            tick();
+        });
     }
 
     _create(source) {
@@ -306,92 +356,6 @@ class IosSelector {
         return scroll;
     }
 
-    /**
-     * 以初速度 initV 滚动
-     * @param {init} initV， initV 会被重置
-     * 以根据加速度确保滚动到整数 scroll (保证能通过 scroll 定位到一个选中值)
-     */
-    async _animateMoveByInitV(initV) {
-        // console.log(initV);
-
-        let initScroll;
-        let finalScroll;
-        let finalV;
-
-        let totalScrollLen;
-        let a;
-        let t;
-
-        if (this.type === 'normal') {
-            if (this.scroll < 0 || this.scroll > this.source.length - 1) {
-                a = this.exceedA;
-                initScroll = this.scroll;
-                finalScroll = this.scroll < 0 ? 0 : this.source.length - 1;
-                totalScrollLen = initScroll - finalScroll;
-
-                t = Math.sqrt(Math.abs(totalScrollLen / a));
-                initV = a * t;
-                initV = this.scroll > 0 ? -initV : initV;
-                finalV = 0;
-                await this._animateToScroll(initScroll, finalScroll, t);
-            } else {
-                initScroll = this.scroll;
-                a = initV > 0 ? -this.a : this.a; // 减速加速度
-                t = Math.abs(initV / a); // 速度减到 0 花费时间
-                totalScrollLen = initV * t + (a * t * t) / 2; // 总滚动长度
-                finalScroll = Math.round(this.scroll + totalScrollLen); // 取整，确保准确最终 scroll 为整数
-                finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
-
-                totalScrollLen = finalScroll - initScroll;
-                t = Math.sqrt(Math.abs(totalScrollLen / a));
-                await this._animateToScroll(this.scroll, finalScroll, t, 'easeOutQuart');
-            }
-        } else {
-            initScroll = this.scroll;
-
-            a = initV > 0 ? -this.a : this.a; // 减速加速度
-            t = Math.abs(initV / a); // 速度减到 0 花费时间
-            totalScrollLen = initV * t + (a * t * t) / 2; // 总滚动长度
-            finalScroll = Math.round(this.scroll + totalScrollLen); // 取整，确保准确最终 scroll 为整数
-            await this._animateToScroll(this.scroll, finalScroll, t, 'easeOutQuart');
-        }
-
-        // await this._animateToScroll(this.scroll, finalScroll, initV, 0);
-
-        this._selectByScroll(this.scroll);
-    }
-
-    _animateToScroll(initScroll, finalScroll, t, easingName = 'easeOutQuart') {
-        if (initScroll === finalScroll || t === 0) {
-            this._moveTo(initScroll);
-            return;
-        }
-
-        let start = new Date().getTime() / 1000;
-        let pass = 0;
-        let totalScrollLen = finalScroll - initScroll;
-
-        // console.log(initScroll, totalScrollLen);
-
-        // console.log(initScroll, finalScroll, initV, finalV, a);
-        return new Promise((resolve, reject) => {
-            this.moving = true;
-            let tick = () => {
-                pass = new Date().getTime() / 1000 - start;
-
-                if (pass < t) {
-                    this.scroll = this._moveTo(initScroll + easing[easingName](pass / t) * totalScrollLen);
-                    this.moveT = requestAnimationFrame(tick);
-                } else {
-                    resolve();
-                    this._stop();
-                    this.scroll = this._moveTo(initScroll + totalScrollLen);
-                }
-            };
-            tick();
-        });
-    }
-
     _stop() {
         cancelAnimationFrame(this.moveT);
     }
@@ -409,14 +373,6 @@ class IosSelector {
         this.onChange && this.onChange(this.selected);
     }
 
-    updateSource(source) {
-        this._create(source);
-
-        if (!this.moving) {
-            this._selectByScroll(this.scroll);
-        }
-    }
-
     select(value) {
         for (let i = 0; i < this.source.length; i++) {
             if (this.source[i].value === value) {
@@ -424,7 +380,7 @@ class IosSelector {
                 // this.scroll = this._moveTo(i);
                 let initScroll = this._normalizeScroll(this.scroll);
                 let finalScroll = i;
-                let t = Math.sqrt(Math.abs((finalScroll - initScroll) / this.a));
+                let t = Math.sqrt(Math.abs((finalScroll - initScroll) / this.a)); //도달하는데 20초 걸린다.
                 this._animateToScroll(initScroll, finalScroll, t);
                 setTimeout(() => this._selectByScroll(i));
                 return;
@@ -434,24 +390,9 @@ class IosSelector {
     }
 }
 
-// date logic
-
-function getYears() {
-    let currentYear = new Date().getFullYear();
-    let years = [];
-
-    for (let i = currentYear - 20; i < currentYear + 20; i++) {
-        years.push({
-            value: i,
-            text: i + '年',
-        });
-    }
-    return years;
-}
-
 function getMonths(year) {
     let months = [];
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 32; i++) {
         months.push({
             value: i,
             text: i + '月',
@@ -460,31 +401,11 @@ function getMonths(year) {
     return months;
 }
 
-function getDays(year, month) {
-    let dayCount = new Date(year, month, 0).getDate();
-    let days = [];
-
-    for (let i = 1; i <= dayCount; i++) {
-        days.push({
-            value: i,
-            text: i + '日',
-        });
-    }
-
-    return days;
-}
-
-let currentYear = new Date().getFullYear();
 let currentMonth = 1;
-let currentDay = 1;
 
-let yearSelector;
 let monthSelector;
-let daySelector;
 
-yearSource = getYears();
 monthSource = getMonths();
-daySource = getDays(currentYear, currentMonth);
 
 monthSelector = new IosSelector({
     el: '#month1',
@@ -493,8 +414,6 @@ monthSelector = new IosSelector({
     count: 20,
     onChange: (selected) => {
         currentMonth = selected.value;
-
-        daySource = getDays(currentYear, currentMonth);
     },
 });
 

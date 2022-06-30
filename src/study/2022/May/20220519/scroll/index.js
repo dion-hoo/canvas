@@ -63,12 +63,13 @@ class Rolldate {
         this.isPicker = options.isPicker ?? false;
         this.isAnimation = options.isAnimation ?? true;
 
+        this.touchData = [];
+
         this.mouse = {
             moveY: 0,
             offsetY: 0,
             endScroll: 0,
             isDown: false,
-            isMove: false,
         };
 
         const list = this.el.querySelector('.options');
@@ -87,74 +88,38 @@ class Rolldate {
         this.el.addEventListener('touchmove', this.onMove.bind(this));
         this.el.addEventListener('touchend', this.onEnd.bind(this));
 
-        this.el.addEventListener('click', this.onClick.bind(this));
         this.el.addEventListener('mousedown', this.onStart.bind(this));
         this.el.addEventListener('mousemove', this.onMove.bind(this));
         this.el.addEventListener('mouseup', this.onEnd.bind(this));
 
-        if (this.isAnimation) {
-            this.onSelect(this.startDate);
-        } else {
-            this.scroll = 0;
-
-            for (let i = 0; i < this.source.length; i++) {
-                if (+this.source[i].dataset.value === this.startDate) {
-                    const initScroll = this.scroll;
-                    const finalScroll = i;
-                    const moveScroll = Math.abs(finalScroll - initScroll);
-
-                    this.scroll = this.moveTo(moveScroll);
-
-                    break;
-                }
-            }
-        }
-    }
-
-    onClick(event) {
-        const { index } = event.target.dataset;
-        const { isMove } = this.mouse;
-
-        if (index && !isMove && this.isPicker) {
-            const initScroll = this.scroll;
-            const finalScroll = +index;
-            const moveScroll = Math.abs(finalScroll - initScroll);
-            const velocity = moveScroll / 5;
-
-            console.log('click');
-
-            this.animateToScroll(initScroll, finalScroll, velocity);
-        }
+        this.onSelect(this.startDate);
     }
 
     onStart(event) {
-        this.mouse.moveY = 0;
-        this.mouse.offsetY = event.clientY || event.touches[0].clientY;
+        const eventY = event.clientY || event.touches[0].clientY;
+
+        this.mouse.offsetY = eventY;
         this.mouse.isDown = true;
-        this.mouse.isMove = false;
-
-        this.startY = event.clientY || event.touches[0].clientY;
-
-        this.startTimeStamp = new Date().getTime() / 1000;
-        this.endTimeStamp = 0;
-
         this.mouse.endScroll = this.scroll;
 
-        // 클릭 시 바로 정지
+        this.startTimeStamp = new Date().getTime();
+
         this.stop();
     }
 
     onMove(event) {
         if (this.mouse.isDown) {
-            let eventY = event.clientY || event.touches[0].clientY;
+            const eventY = event.clientY || event.touches[0].clientY;
 
-            this.mouse.isMove = true;
-            this.endTimeStamp = new Date().getTime() / 1000;
-            this.mouse.moveY = (eventY - this.mouse.offsetY) / this.height;
+            this.touchData.push([eventY, new Date().getTime() / 1000]);
 
+            // time
+            this.endTimeStamp = new Date().getTime();
+
+            // scroll
             this.endY = eventY;
-
-            let moveToScroll = this.mouse.moveY + this.scroll;
+            this.mouse.moveY = (this.mouse.offsetY - eventY) / this.height;
+            let moveToScroll = this.scroll + this.mouse.moveY;
 
             if (moveToScroll < 0) {
                 // 처음일때
@@ -171,22 +136,40 @@ class Rolldate {
     onEnd() {
         this.mouse.isDown = false;
         this.scroll = this.mouse.endScroll;
-        let velocity = 0;
 
-        if (this.endTimeStamp !== 0) {
-            velocity = (this.endY - this.startY) / this.height / (this.endTimeStamp - this.startTimeStamp);
+        let velocity;
+
+        console.log(this.touchData);
+
+        if (this.touchData.length === 1) {
+            velocity = 0;
+        } else {
+            const { length } = this.touchData;
+
+            // 한칸 이동했을 경우의 거리와 속력 구하기
+            const startTime = this.touchData[length - 2][1];
+            const endTime = this.touchData[length - 1][1];
+            const startY = this.touchData[length - 2][0];
+            const endY = this.touchData[length - 1][0];
+
+            velocity = (startY - endY) / this.height / (endTime - startTime);
         }
 
-        const distance = velocity * 0.8;
         const initScroll = this.scroll;
-        let finalScroll = Math.round(this.scroll + distance);
+        let distance = velocity * 0.4;
 
+        let finalScroll = Math.round(this.scroll + distance);
         finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
 
-        const totalScrollLen = finalScroll - initScroll;
-        const time = Math.abs(totalScrollLen / 8);
+        distance = finalScroll - initScroll;
+
+        let time = velocity === 0 ? 0 : Math.abs(distance / velocity);
+
+        console.log(initScroll, finalScroll, time, distance, velocity);
 
         this.animateToScroll(initScroll, finalScroll, time);
+
+        this.touchData = [];
     }
 
     moveTo(scroll) {
@@ -203,7 +186,7 @@ class Rolldate {
         return scroll;
     }
 
-    animateToScroll(initScroll, finalScroll, time, easingName = 'easeOutExpo') {
+    animateToScroll(initScroll, finalScroll, time, easingName = 'easeOutQuart') {
         let scrollLength = finalScroll - initScroll;
         let startTimeStamp = new Date().getTime() / 1000; // second
         // 타임 스탬프 값을 얻는다. 타임스탬프란 현재 시간을 밀리 세컨드 단위로 변환하여 보여주는 것
