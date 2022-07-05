@@ -102,13 +102,15 @@ const animate = () => {
 
         for (let i = index + 1; i < balls.length; i++) {
             // 충돌했을 경우
-            if (balls[index].collsiion(balls[i])) {
+            if (balls[index].collision(balls[i], ctx)) {
                 balls[index].resolution(balls[i]);
+                balls[index].collisionBall(balls[i]);
             }
         }
 
         ball.update();
         ball.display(ctx);
+        ball.bounce();
     });
 
     requestAnimationFrame(animate);
