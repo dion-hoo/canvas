@@ -57,13 +57,15 @@ class Rolldate {
         this.cancelAnimation = null;
         this.half = 7;
 
+        this.deceleration = 8; // 감속
         this.initDateIndex = options.initDateIndex ?? 0;
         this.scroll = this.initDateIndex;
         this.startDate = options.startDate;
         this.isPicker = options.isPicker ?? false;
         this.isAnimation = options.isAnimation ?? true;
 
-        this.touchData = [];
+        this.startY = 0;
+        this.endY = 0;
 
         this.mouse = {
             moveY: 0,
@@ -102,7 +104,10 @@ class Rolldate {
         this.mouse.isDown = true;
         this.mouse.endScroll = this.scroll;
 
-        this.startTimeStamp = new Date().getTime();
+        this.startY = eventY;
+
+        // 처음 눌렀을때의 시간
+        this.startTimeStamp = new Date().getTime() / 1000;
 
         this.stop();
     }
@@ -111,13 +116,11 @@ class Rolldate {
         if (this.mouse.isDown) {
             const eventY = event.clientY || event.touches[0].clientY;
 
-            this.touchData.push([eventY, new Date().getTime() / 1000]);
-
             // time
-            this.endTimeStamp = new Date().getTime();
+            this.endTimeStamp = new Date().getTime() / 1000;
 
-            // scroll
             this.endY = eventY;
+
             this.mouse.moveY = (this.mouse.offsetY - eventY) / this.height;
             let moveToScroll = this.scroll + this.mouse.moveY;
 
@@ -136,40 +139,26 @@ class Rolldate {
     onEnd() {
         this.mouse.isDown = false;
         this.scroll = this.mouse.endScroll;
+        let velocity = 0;
 
-        let velocity;
+        velocity = (this.startY - this.endY) / this.height / (this.endTimeStamp - this.startTimeStamp);
 
-        console.log(this.touchData);
+        const sign = velocity > 0 ? 1 : -1;
+        const MAXSPEED = 10;
+        const v = Math.abs(velocity) > MAXSPEED ? MAXSPEED * sign : velocity;
 
-        if (this.touchData.length === 1) {
-            velocity = 0;
-        } else {
-            const { length } = this.touchData;
+        const time = Math.abs(v / this.deceleration); // 속도가 0이 되는 시간을 구한다.
 
-            // 한칸 이동했을 경우의 거리와 속력 구하기
-            const startTime = this.touchData[length - 2][1];
-            const endTime = this.touchData[length - 1][1];
-            const startY = this.touchData[length - 2][0];
-            const endY = this.touchData[length - 1][0];
-
-            velocity = (startY - endY) / this.height / (endTime - startTime);
-        }
+        let distance = v * time + (this.deceleration * time * time) / 2; //제동거리 공식
 
         const initScroll = this.scroll;
-        let distance = velocity * 0.4;
-
         let finalScroll = Math.round(this.scroll + distance);
         finalScroll = finalScroll < 0 ? 0 : finalScroll > this.source.length - 1 ? this.source.length - 1 : finalScroll;
 
-        distance = finalScroll - initScroll;
+        distance = Math.abs(finalScroll - initScroll);
+        let t = v === 0 ? 0 : distance / this.deceleration;
 
-        let time = velocity === 0 ? 0 : Math.abs(distance / velocity);
-
-        console.log(initScroll, finalScroll, time, distance, velocity);
-
-        this.animateToScroll(initScroll, finalScroll, time);
-
-        this.touchData = [];
+        this.animateToScroll(initScroll, finalScroll, t);
     }
 
     moveTo(scroll) {
@@ -239,8 +228,10 @@ class Rolldate {
                 const initScroll = this.scroll;
                 const finalScroll = i;
                 const moveScroll = Math.abs(finalScroll - initScroll);
-                const time = moveScroll / 8; // 도달 위치를 8초안에 이동을 해야한다.
-                // 그래서 1초에 이동할 속도를 구한다.
+
+                // 최종 목적지에 도달하는 데 걸리는 시간
+                // v = s / t , t = s / v;
+                const time = moveScroll / this.deceleration;
 
                 this.animateToScroll(initScroll, finalScroll, time);
 

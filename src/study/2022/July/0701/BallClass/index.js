@@ -5,9 +5,6 @@ const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 const ratio = devicePixelRatio;
 let balls = [];
-let ball1;
-let ball2;
-let ball3;
 
 const KEY = {
     LEFT: false,
@@ -17,12 +14,16 @@ const KEY = {
 };
 
 const init = () => {
-    ball1 = new Ball(300, 200, 50);
-    ball2 = new Ball(500, 500, 70);
-    ball3 = new Ball(700, 500, 100);
+    for (let i = 0; i < 1; i++) {
+        const radius = Math.random() * 50 + 40;
 
-    ball1.player = true;
-    balls.push(ball1, ball2, ball3);
+        const x = Math.random() * innerWidth + radius - radius;
+        const y = Math.random() * innerHeight + radius - radius;
+
+        balls.push(new Ball(x, y, radius));
+    }
+
+    balls[0].player = true;
 };
 
 const resize = () => {
@@ -34,9 +35,9 @@ const resize = () => {
 
     ctx.scale(ratio, ratio);
 
-    ball1.resize(innerWidth, innerHeight);
-    ball2.resize(innerWidth, innerHeight);
-    ball3.resize(innerWidth, innerHeight);
+    for (let b of balls) {
+        b.resize(innerWidth, innerHeight);
+    }
 };
 
 const onDown = (event) => {

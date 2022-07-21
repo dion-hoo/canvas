@@ -6,7 +6,7 @@ export class Ball {
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
         this.radius = radius;
-        this.friction = 0.035;
+        this.friction = 0.03;
         this.player = false;
     }
 
@@ -43,12 +43,12 @@ export class Ball {
     collisionBall(b2) {
         let normal = this.location.sub(b2.location).unit();
         let velocity = this.velocity.sub(b2.velocity);
-        let sepVel = Vector.dot(velocity, normal);
-        let new_sepVel = -sepVel;
-        let sepVelVec = normal.mult(new_sepVel);
+        let sepVel = Vector.dot(velocity, normal); //스칼라 값
+        let newSepVel = -sepVel; // 내가 이해한 바로는 상대속도와 법선을 이용한 내적의 방향이 normal방향과 반대 이기 때문에 -1 곱해준다.
+        let newSepVelVec = normal.mult(newSepVel); // newSepVel 스칼라 이기 떄문에, 즉 값밖에 없기 때문에 백터로(즉 방향과 크기가 있는) 걸로 만들어 준다.
 
-        this.velocity = this.velocity.add(sepVelVec);
-        b2.velocity = b2.velocity.add(sepVelVec.mult(-1));
+        this.velocity = this.velocity.add(newSepVelVec);
+        b2.velocity = b2.velocity.add(newSepVelVec.mult(-1));
     }
 
     update() {
@@ -57,6 +57,8 @@ export class Ball {
         this.location = this.location.add(this.velocity);
 
         this.velocity = this.velocity.mult(1 - this.friction);
+
+        this.acceleration = this.acceleration.mult(1 - this.friction);
     }
 
     bounce() {
@@ -81,9 +83,15 @@ export class Ball {
     }
 
     display(ctx) {
-        this.velocity.drawVec(ctx, this.width * 0.8, this.height * 0.8, 10, 'red');
-        this.acceleration.unit().drawVec(ctx, this.width * 0.8, this.height * 0.8, 50, 'green');
-        this.acceleration.normal().drawVec(ctx, this.width * 0.8, this.height * 0.8, 50, 'deeppink');
+        this.velocity.drawVec(ctx, this.width * 0.8, this.height * 0.8, 50, 'red');
+        // this.acceleration.unit().drawVec(ctx, this.width * 0.8, this.height * 0.8, 50, 'green');
+        // this.acceleration.normal().drawVec(ctx, this.width * 0.8, this.height * 0.8, 50, 'deeppink');
+
+        ctx.strokeStyle = 'green';
+        ctx.beginPath();
+        ctx.moveTo(this.location.x, this.location.y);
+        ctx.lineTo((this.location.x + this.velocity.x) * 1, (this.location.y + this.velocity.y) * 1);
+        ctx.stroke();
 
         ctx.beginPath();
         ctx.strokeStyle = '#fff';
