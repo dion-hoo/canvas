@@ -143,6 +143,8 @@ class IosSelector {
             // 计算速度
             v = (startY - endY) / this.itemHeight / (endTime - startTime);
 
+            console.log(v);
+
             let sign = v > 0 ? 1 : -1;
 
             v = Math.abs(v) > 30 ? 30 * sign : v;

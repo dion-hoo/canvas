@@ -52,10 +52,10 @@ class Rolldate {
     constructor(options) {
         this.el = options.trigger;
         this.source = options.source;
-        this.count = options.count - (options.count % 4);
-        this.itemAngle = 360 / this.count;
+        this.itemAngle = options.angle;
+
         this.cancelAnimation = null;
-        this.half = 7;
+        this.half = options.length;
 
         this.deceleration = 8; // 감속
         this.initDateIndex = options.initDateIndex ?? 0;
@@ -64,9 +64,6 @@ class Rolldate {
         this.isPicker = options.isPicker ?? false;
         this.isAnimation = options.isAnimation ?? true;
 
-        this.startY = 0;
-        this.endY = 0;
-
         this.mouse = {
             moveY: 0,
             offsetY: 0,
@@ -74,7 +71,7 @@ class Rolldate {
             isDown: false,
         };
 
-        const list = this.el.querySelector('.options');
+        const list = this.el.querySelector('.day');
         const target = [...list.children][0];
         const regex = /\D+/gi;
         const style = getComputedStyle(target).height;
@@ -104,7 +101,9 @@ class Rolldate {
         this.mouse.isDown = true;
         this.mouse.endScroll = this.scroll;
 
-        this.startY = eventY;
+        this.touchData = {
+            yArr: [],
+        };
 
         // 처음 눌렀을때의 시간
         this.startTimeStamp = new Date().getTime() / 1000;
@@ -119,17 +118,18 @@ class Rolldate {
             // time
             this.endTimeStamp = new Date().getTime() / 1000;
 
-            this.endY = eventY;
-
             this.mouse.moveY = (this.mouse.offsetY - eventY) / this.height;
+
+            this.touchData.yArr.push([this.mouse.moveY, new Date().getTime() / 1000]);
+
             let moveToScroll = this.scroll + this.mouse.moveY;
 
             if (moveToScroll < 0) {
                 // 처음일때
-                moveToScroll *= 0.3;
+                moveToScroll = moveToScroll * 0.3;
             } else if (moveToScroll > this.source.length) {
                 // 제일 끝일때
-                moveToScroll = this.source.length + (moveToScroll - this.source.length - 1) * 0.2;
+                moveToScroll = this.source.length + (moveToScroll - this.source.length) * 0.2;
             }
 
             this.mouse.endScroll = this.moveTo(moveToScroll);
@@ -141,15 +141,26 @@ class Rolldate {
         this.scroll = this.mouse.endScroll;
         let velocity = 0;
 
-        velocity = (this.startY - this.endY) / this.height / (this.endTimeStamp - this.startTimeStamp);
+        if (this.touchData.yArr.length !== 0) {
+            let startTime = this.touchData.yArr[this.touchData.yArr.length - 2][1];
+            let endTime = this.touchData.yArr[this.touchData.yArr.length - 1][1];
+            let startY = this.touchData.yArr[this.touchData.yArr.length - 2][0];
+            let endY = this.touchData.yArr[this.touchData.yArr.length - 1][0];
 
-        const sign = velocity > 0 ? 1 : -1;
+            // 한번 이동하는 거리 / 얼마만의 시간 = 속력(m/s)
+            velocity = (endY - startY) / 3 / (endTime - startTime);
+        }
+
         const MAXSPEED = 10;
-        const v = Math.abs(velocity) > MAXSPEED ? MAXSPEED * sign : velocity;
+        const direction = velocity > 0 ? 1 : -1;
+        const v = Math.abs(velocity) > MAXSPEED ? MAXSPEED * direction : velocity;
 
+        // 만약에 시간을 구한다면
         const time = Math.abs(v / this.deceleration); // 속도가 0이 되는 시간을 구한다.
-
         let distance = v * time + (this.deceleration * time * time) / 2; //제동거리 공식
+
+        // 만약, 시간을 구하지 않고, 속도로 조절을 한다면
+        // let distance2 = ((Math.pow(v2) - Math.pow(v)) / 2) * this.deceleration;
 
         const initScroll = this.scroll;
         let finalScroll = Math.round(this.scroll + distance);
@@ -162,7 +173,7 @@ class Rolldate {
     }
 
     moveTo(scroll) {
-        const list = this.el.querySelector('.options');
+        const list = this.el.querySelector('.day');
 
         list.style.transform = `rotateX(${this.itemAngle * scroll}deg)`;
 

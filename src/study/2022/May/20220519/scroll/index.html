@@ -9,68 +9,69 @@
         <link rel="stylesheet" href="./index.min.css" />
     </head>
     <body>
-        <div class="date-selector">
-            <div class="day">
-                <ul class="options">
-                    <li>1일</li>
-                    <li>2일</li>
-                    <li>3일</li>
-                    <li>4일</li>
-                    <li>5일</li>
-                    <li>6일</li>
-                    <li>7일</li>
-                    <li>8일</li>
-                    <li>9일</li>
-                    <li>10일</li>
-                    <li>11일</li>
-                    <li>12일</li>
-                    <li>13일</li>
-                    <li>14일</li>
-                    <li>15일</li>
-                    <li>16일</li>
-                    <li>17일</li>
-                    <li>18일</li>
-                    <li>19일</li>
-                    <li>20일</li>
-                    <li>21일</li>
-                    <li>22일</li>
-                    <li>23일</li>
-                    <li>24일</li>
-                    <li>25일</li>
-                    <li>26일</li>
-                    <li>27일</li>
-                    <li>28일</li>
-                    <li>29일</li>
-                    <li>30일</li>
-                    <li>31일</li>
-                    <li>32일</li>
-                    <li>33일</li>
-                </ul>
-                <div class="highLight">
-                    <div class="highLight__inner"></div>
-                </div>
-            </div>
+        <div class="selector">
+            <ul class="day">
+                <li>1일</li>
+                <li>2일</li>
+                <li>3일</li>
+                <li>4일</li>
+                <li>5일</li>
+                <li>6일</li>
+                <li>7일</li>
+                <li>8일</li>
+                <li>9일</li>
+                <li>10일</li>
+                <li>11일</li>
+                <li>12일</li>
+                <li>13일</li>
+                <li>14일</li>
+                <li>15일</li>
+                <li>16일</li>
+                <li>17일</li>
+                <li>18일</li>
+                <li>19일</li>
+                <li>20일</li>
+                <li>21일</li>
+                <li>22일</li>
+                <li>23일</li>
+                <li>24일</li>
+                <li>25일</li>
+                <li>26일</li>
+                <li>27일</li>
+                <li>28일</li>
+                <li>29일</li>
+                <li>30일</li>
+                <li>31일</li>
+                <li>32일</li>
+                <li>33일</li>
+            </ul>
         </div>
         <script src="./index.js"></script>
         <script>
             const now = new Date();
-            const count = 20;
             let daySelector;
 
             // day
-            const day = document.querySelector('.day');
-            const dayItems = day.querySelectorAll('.options li');
+            const day = document.querySelector('.selector');
+            const dayHeight = day.clientHeight;
+
+            const dayItems = day.querySelectorAll('.day li');
+            let angle;
+            let length;
 
             const createItemStyle = (item) => {
                 const itemHeight = item[0].clientHeight;
-                const rotate = 360 / count;
-                const distance = itemHeight / Math.tan((rotate * Math.PI) / 180);
+                const distance = dayHeight / 2;
+                const rotate = Math.atan(itemHeight / 2 / distance) * 2;
+
+                angle = (rotate * 180) / Math.PI;
+                length = dayHeight / itemHeight;
 
                 [...item].forEach((li, index) => {
                     const regex = /\D+/gi;
                     const number = li.innerText.replace(regex, '');
 
-                    li.style.transform = `rotateX(-${rotate * index}deg) translate3d(0, 0, ${distance}px)`;
+                    li.style.transform = `rotateX(-${angle * index}deg) translate3d(0, 0, ${distance}px)`;
                     li.setAttribute('data-value', number);
                     li.setAttribute('data-index', index);
                 });
@@ -81,7 +82,8 @@
             daySelector = new Rolldate({
                 trigger: day,
                 source: dayItems,
-                count,
+                angle: angle,
+                length: length,
                 initDateIndex: 10,
                 startDate: now.getDate(),
             });
